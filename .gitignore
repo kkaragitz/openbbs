@@ -1,0 +1,9 @@
+asciichan.log
+database.db
+__pycache__/
+env/
+build/
+dist/
+*.egg-info/
+*.egg
+.tox/
