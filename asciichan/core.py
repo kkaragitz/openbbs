@@ -1,12 +1,31 @@
 """Core functionality for the Asciichan server."""
 
+import argparse
 import configparser
+import daemon
 import logging
+import os
 import socket
-import sys
 import threading
 
+import asciichan
 import asciichan.session
+
+
+class CustomHelp(argparse.HelpFormatter):
+    """Small modifications argparse's default HelpFormatter."""
+    def _fill_text(self, text, width, indent):
+        return "".join(indent + line
+                       for line in text.splitlines(keepends=True))
+
+    def _split_lines(self, text, width):
+        return text.splitlines()
+
+    def add_usage(self, usage, actions, groups, prefix=None):
+        if prefix is None:
+            prefix = "Usage: "
+        return super(CustomHelp, self).add_usage(usage, actions, groups,
+                                                 prefix)
 
 
 def spawn_server(config):
@@ -44,16 +63,48 @@ def spawn_server(config):
         logging.info("Server exited.")
 
 
+def parse_arguments():
+    """Parse command-line arguments and return the namespace."""
+    parser = argparse.ArgumentParser(
+        add_help=False, formatter_class=CustomHelp,
+        usage="%(prog)s [path/to/config.ini] [OPTIONS]",
+        description=asciichan.__doc__)
+    parser._positionals.title = 'Positional Arguments'
+    parser._optionals.title = 'Optional Arguments'
+    parser.add_argument("-h", "--help", action="help",
+                        help="Display this help page and exit.")
+    parser.add_argument(
+        "-v", "--version", action="version",
+        version="Asciichan Version %s." % asciichan.__version__,
+        help="Display the currently installed version and exit."
+    )
+    parser.add_argument("-b", "--daemonize", action="store_true",
+                        help="Run the server as a UNIX daemon. (Background "
+                        "Process)")
+    parser.add_argument("-c", "--config", metavar="XX", default="./config.ini",
+                        help="Specify the path of the config.ini file that "
+                        "the Asciichan\nserver should read from.")
+    return parser.parse_args()
+
+
 def main():
     """Primary entry point to the server, parses the configuration file and 
     sets up the server environment.
     """
-    path = sys.argv[1] if len(sys.argv) > 1 else "./config.ini"
+    arguments = parse_arguments()
     config = configparser.ConfigParser()
-    config.read(path)
+    config.read(arguments.config)
     logging.basicConfig(format="[%(asctime)s] %(levelname)s: %(message)s",
                         datefmt="%H:%M:%S",
                         level=logging.INFO,
                         filename=config.get("server", "logfile"))
-    spawn_server(config)
+    if arguments.daemonize:
+        context = daemon.DaemonContext()
+        context.files_preseve = [arguments.config, config.get("server",
+                                                              "database")]
+        context.working_directory = os.getcwd()
+        with context:
+            spawn_server(config)
+    else:
+        spawn_server(config)
     logging.info("Server closed.")

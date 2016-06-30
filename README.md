@@ -1,9 +1,7 @@
 ![Asciichan](https://raw.github.com/TsarFox/asciichan/master/Asciichan_Logo.png "Asciichan")
 =====
 ## Server software programmed and maintained by [Jakob.](http://tsar-fox.com/)
-Asciichan is a simple BBS server written in Python.
-
-It is designed to work on both Python2 and Python3, and has no dependencies outside of the standard library.
+Asciichan is a simple BBS server written in Python. It is designed to work on both Python2 and Python3.
 
 Asciichan is free software, licensed under the GNU Affero General Public License.
 
@@ -14,6 +12,7 @@ Main Features
 * Users have the option of making an account, or using the BBS anonymously.
 * A private message system is available for registered users.
 * Moderation is easy, sysops can easily delete posts and ban user accounts.
+* Ability to run as a daemon.
 
 ============
 Installation
@@ -30,13 +29,17 @@ Currently, the most reliable way to install the Asciichan server is through Pip.
 Tutorial
 ========
 
-As of right now, Asciichan cannot daemonize itself. To run the server in the background, the & symbol must be used.
+The server can be invoked with the following.
 
-    $ asciichan-server &
+    $ asciichan-server
 
-A "config.ini" file can be supplied as a command-line argument. If a path is not given, Asciichan will attempt to look for one in the current working directory.
+However, running it like that is kind of pointless. The server can run as a background process if invoked with the "-b" or "--daemonize" arguments.
 
-    $ asciichan-server /home/user/config.ini &
+    $ asciichan-server --daemonize
+
+Regardless of how it is run, the server will attempt to run according to a config.ini file in the current working directory. If the configuration file is located somewhere else, that should be specified with the "-c" or "--config" parameter.
+
+    $ asciichan-server --daemonize -c /home/user/config.ini
 
 =============
 Configuration
