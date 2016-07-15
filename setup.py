@@ -28,7 +28,7 @@ setup(name="Asciichan",
       install_requires=["python-daemon>=2.1.1"],
       extras_require={},
       tests_require=["tox"],
-      entry_points={"console_scripts": ["asciichan-server = asciichan.core:main"]},
+      entry_points={"console_scripts": ["asciichan-server = asciichan.cli:main"]},
       classifiers=[
           "Development Status :: 1 - Planning",
           "Environment :: No Input/Output (Daemon)",
@@ -53,4 +53,5 @@ setup(name="Asciichan",
           'Topic :: System :: Networking',
           "Topic :: Terminals :: Telnet"
       ],
+      keywords="bbs telnet server"
      )

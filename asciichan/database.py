@@ -25,7 +25,8 @@ class Database(object):
                             "TEXT, ip TEXT, reason TEXT NOT NULL);")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS pms (sender TEXT NOT "
                             "NULL, receiver TEXT NOT NULL, message TEXT NOT "
-                            "NULL, read INTEGER NOT NULL);")
+                            "NULL, time INTEGER NOT NULL, read INTEGER NOT "
+                            "NULL);")
 
     def create_user(self, username, password):
         """Creates a database entry in the users table for the given username
@@ -135,11 +136,11 @@ class Database(object):
         if thread:
             self.cursor.execute("SELECT post_id, time, name, subject, body "
                                 "FROM posts WHERE post_id=? OR reply=? ORDER "
-                                "BY post_id ASC;",(thread, thread))
+                                "BY post_id ASC;", (thread, thread))
         else:
             self.cursor.execute("SELECT post_id, time, name, subject, body "
                                 "FROM posts WHERE board=? AND reply IS NULL "
-                                "ORDER BY post_id DESC;",(board,))
+                                "ORDER BY post_id DESC;", (board,))
         return self.cursor.fetchall()
 
     def make_post(self, name, subject, body, board, reply=None):
@@ -157,8 +158,8 @@ class Database(object):
                             (receiver,))
         if self.cursor.fetchone():
             self.cursor.execute("INSERT INTO pms (sender, receiver, message, "
-                                "read) VALUES (?, ?, ?, 0);",
-                                (sender, receiver, message))
+                                "time, read) VALUES (?, ?, ?, ?, 0);",
+                                (sender, receiver, message, time.time()))
             self.connection.commit()
             return True
 
@@ -170,8 +171,9 @@ class Database(object):
 
     def get_pms(self, receiver):
         """Get all of the PM's sent to the given receiver."""
-        self.cursor.execute("SELECT sender, message, read FROM pms WHERE "
-                            "receiver=?;", (receiver,))
+        self.cursor.execute("SELECT sender, message, time, read FROM pms "
+                            "WHERE receiver=? ORDER BY time DESC;",
+                            (receiver,))
         messages = self.cursor.fetchall()
         self.cursor.execute("UPDATE pms SET read=1 WHERE receiver=?;",
                             (receiver,))

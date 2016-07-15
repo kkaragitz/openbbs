@@ -1,18 +1,22 @@
-============
-Contributing
-============
-
-The current version of Asciichan is a very early development snapshot. Contributions of any form, including feature requests, are greatly appreciated.
-
-============================
 Reporting Bugs and Anomalies
-============================
+----------------------------
 
-Be sure to include specific details about the bug, such as relevant log output and details about what you were trying to do.
+Be sure to include specific details about the bug, such as relevant log output and details about what you were trying to do. 
 
-=================================
+
 Directly Contributing Source Code
-=================================
+---------------------------------
 
-It is recommended that you fork the repository. Tests are done in Tox, which is run from the repository's root directory.
-If reimplementing something breaks a test, please add a comment and modify the test to better reflect the code's functionality.
+Pull requests are greatly, greatly appreciated and will be accepted in a timely fashion provided that they improve the codebase in some way.
+
+Your contribution should follow [PEP 8 Guidelines](https://www.python.org/dev/peps/pep-0008/ "PEP 8"), and, if possible, [Google's Python Style Guidelines](https://google.github.io/styleguide/pyguide.html "Google Style Guidelines").
+
+Tests are done in Tox, which is run from the repository's root directory. Please write unittests for anything you add.
+
+Feel free to add yourself to the AUTHORS.md file, you deserve credit for your contributions.
+
+
+Feature Requests
+----------------
+
+Please don't open an issue for it. Get in contact with the [Project Maintainer](http://tsar-fox.com/), or if you can - implement it yourself.

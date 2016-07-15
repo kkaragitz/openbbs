@@ -4,10 +4,11 @@ import unittest
 
 import tests.dummy_objects
 
+import asciichan.login
 import asciichan.shell
 
 
-def send(*args):
+def send(*args, **kwargs):
     """Dummy send function."""
     pass
 
@@ -26,7 +27,7 @@ class FormattersTest(unittest.TestCase):
 
 class LoginTest(unittest.TestCase):
     def test_login_prompt(self):
-        self.assertEqual(asciichan.shell.login(
+        self.assertEqual(asciichan.login.prompt(
             send,
             receive,
             tests.dummy_objects.DummyClient(),

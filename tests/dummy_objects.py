@@ -12,6 +12,12 @@ class DummyClient(object):
         pass
 
 
+class DummyDatabase(object):
+    """Dummy client to test sessions."""
+    def close(self):
+        pass
+
+
 class DummyConfig(object):
     """Dummy config to test sessions."""
     def get(self, *args):

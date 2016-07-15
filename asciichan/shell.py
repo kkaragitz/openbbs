@@ -1,4 +1,4 @@
-"""Login prompt and shell session to handle client-server interactions."""
+"""Interactive shell for communication between the client and BBS."""
 
 import logging
 import textwrap
@@ -8,40 +8,53 @@ from asciichan import __version__
 
 
 def box_boards(boards):
-    """Text formatter for the BBS's board listiing."""
-    string = "=" * 80 + "\n" + "|" + 32 * " " + "BOARD LISTING" + 33 * " "
-    string += "|\n" + "=" * 80 + "\n"
+    """Text formatter for the board listing."""
+    string = "+=============================================================="\
+             "================+\r\n|                                BOARD LIS"\
+             "TING                                 |\r\n+===================="\
+             "==========================================================+\r\n"
     for title, description in [board.split(":") for board in boards]:
-        string += "| %-19s|%56s |\n" % (title, description) + "=" * 80 + "\n"
+        string += "| %-18s | %55s |\r\n" % (title, description) + "+========="\
+                  "=========================================================="\
+                  "===========+\r\n"
     return string
 
 
 def box_posts(posts):
-    """Text formatter for a listing of threads in one of the BBS's boards."""
-    string = "=" * 80 + "\n" + "|" + 32 * " " + "THREAD LISTING" + 32 * " "
-    string += "|\n" + "=" * 80 + "\n"
+    """Text formatter for a listing of threads in a board."""
+    string = "+=============================================================="\
+             "================+\r\n|                                THREAD LI"\
+             "STING                                |\r\n+===================="\
+             "==========================================================+\r\n"
     for post_id, pub_time, poster, subject, body in posts:
         printable_time = time.strftime("%m/%d/%y %H:%M:%S",
                                        time.localtime(pub_time))
-        string += "| #%-6d|%.17s| %-19s| %-29.29s|" % (post_id, printable_time,
-                                                       poster, subject.strip())
-        string += "\n" + "=" * 80 + "\n"
+        string += "| #%-6d|%.17s| %-19s| %-29.29s|\r\n" % (post_id,
+                                                           printable_time,
+                                                           poster,
+                                                           subject.strip()) 
+        string += "+========================================================="\
+                  "=====================+"
     return string
 
 
 def box_thread(posts):
-    """Returns a table-formatted version of the thread at hand."""
+    """Returns a table-formatted version of the thread being viewed."""
     title = posts[0][3]
-    string = "=" * 80 + "\n" + "|" + ((78 - len(title)) // 2) * " " + title
-    string += ((78 - len(title)) // 2) * " " + "|\n" + "=" * 80 + "\n"
+    string = "+=============================================================="\
+             "================+\r\n|" + ((78 - len(title)) // 2) * " " + title\
+             + ((78 - len(title)) // 2) * " " + "|\r\n+======================"\
+             "========================================================+\r\n"
     for post in posts:
-        string += "| #%-9d | %-26s posted on %-26s |\n" % (post[0],
-                                                           post[2],
-                                                           time.ctime(post[1]))
-        string += "=" * 80 + "\n"
+        post_time = time.ctime(post[1])
+        string += "| #%-9d | %-26s posted on %-26s |\r\n" % (post[0], post[2],
+                                                             post_time)
+        string += "+========================================================="\
+                  "=====================+\r\n"
         for line in textwrap.wrap(post[4], width=76):
-            string += "| %-76s |\n" % line
-        string += "=" * 80 + "\n"
+            string += "| %-76s |\r\n" % line
+        string += "+========================================================="\
+                  "=====================+\r\n"
     return string
 
 
@@ -51,109 +64,95 @@ def shell(send, receive, name, status, database, config):
     current_board = "main"
     current_thread = None
     send(box_boards(boards))
-    send("Enter \"HELP\" to see available commands.\n")
+    send("Enter \"HELP\" to see available commands.")
     while True:
-        send("%s@%s:%s> " % (name, config.get("messages", "name"),
-                             current_board))
+        send("[%s@%s %s]$ " % (name, config.get("messages", "name"),
+                               current_board), end="")
         try:
             command = receive().lower().split(" ")
         except UnicodeDecodeError:
             break
-        logging.info("%s command received from %s." % (" ".join(command), name))
+        logging.info("\"%s\" command received from %s.", " ".join(command),
+                     name)
         if command[0] == "help":
-            send("==================\nAVAILABLE COMMANDS\n==================\n"
-                 "RULES\t\tPrint the rules of the BBS.\n"
-                 "INBOX\t\tGet private messages.\n"
-                 "SEND\t\tSend a private message.\n"
-                 "BOARD\t\tChange to a specified board.\n"
-                 "THREAD\t\tOpen a given thread number.\n"
-                 "REFRESH\t\tRefresh the current listing.\n"
-                 "POST\t\tMake a post or reply.\n"
-                 "INFO\t\tPrint information about this BBS software.\n"
-                 "QUIT\t\tExit the BBS.\n")
+            send("==================\r\nAVAILABLE COMMANDS\r\n================"
+                 "==\r\nRULES\t\tPrint the rules of the BBS.\r\n"
+                 "BOARD\t\tChange to a specified board.\r\n"
+                 "THREAD\t\tOpen a given thread number.\r\n"
+                 "REFRESH\t\tRefresh the current listing.\r\n"
+                 "POST\t\tMake a post or reply.\r\n"
+                 "INFO\t\tPrint information about this BBS software.\r\n"
+                 "QUIT\t\tExit the BBS.")
+            if status != "coward":
+                send("INBOX\t\tGet private messages.\r\n"
+                     "SEND\t\tSend a private message.")
             if status == "sysop":
-                send("DELETE\t\tDelete a post\n"
-                     "BAN\t\tBan a username.\n"
-                     "UNBAN\t\tUnban a username.\n"
-                     "OP\t\tGive a user operator privileges.\n"
-                     "DEOP\t\tRevoke operator privileges from a user.\n")
+                send("DELETE\t\tDelete a post\r\n"
+                     "BAN\t\tBan a username.\r\n"
+                     "UNBAN\t\tUnban a username.\r\n"
+                     "OP\t\tGive a user operator privileges.\r\n"
+                     "DEOP\t\tRevoke operator privileges from a user.")
         elif command[0] == "quit":
             break
         elif command[0] == "rules":
-            send(config.get("messages", "rules") + "\n")
+            send(config.get("messages", "rules"))
         elif command[0] == "info":
             send("Asciichan-BBS Server Version %s. Released under the Affero "
-                 "General\nPublic License Version 3+.\n" % __version__)
+                 "General Public\r\nLicense Version 3+." % __version__)
         elif command[0] == "board":
             if len(command) > 1:
                 board = command[1]
             else:
-                send("BOARD: ")
+                send("BOARD: ", end="")
                 board = receive().lower()
             if board in (board.split(":")[0].lower() for board in boards):
                 current_board = board
                 send(box_posts(database.get_posts(current_board)))
-                send("Board successfully changed to \"%s\".\n" % board)
+                send("Board successfully changed to \"%s\"." % board)
             elif board == "main" or board == "":
                 current_board = "main"
                 send(box_boards(boards))
-                send("Board successfully changed to Main.\n")
+                send("Board successfully changed to Main.")
             else:
-                send("Board \"%s\" does not exist on this BBS.\n" % board)
+                send("Board \"%s\" does not exist on this BBS." % board)
         elif command[0] == "thread":
             if current_board == "main":
-                send("There are no threads here.\n")
+                send("There are no threads here.\r\n")
             elif len(command) > 1:
                 current_thread = command[1]
             else:
-                send("Leave empty to return to the thread listing.\nTHREAD "
-                     "NUMBER: ")
+                send("Leave empty to return to the thread listing.\r\nTHREAD "
+                     "NUMBER: ", end="")
                 current_thread = receive()
             if current_thread == "":
                 send(box_posts(database.get_posts(current_board)))
+                send("Successfully returned to the %s home." % current_board)
                 current_thread = None
             else:
-                send(box_thread(database.get_posts(current_board,
-                                                   current_thread)))
-            send("Current thread changed to %s.\n" % current_thread)
+                posts = database.get_posts(current_board, current_thread)
+                if posts:
+                    send(box_thread(posts))
+                    send("Current thread changed to %s." % current_thread)
+                else:
+                    send("Thread %s does not exist." % current_thread)
+                    current_thread = None
         elif command[0] == "post":
             if current_board == "main":
-                send("You can't post here.\n")
+                send("You can't post here.")
             else:
                 if current_thread:
-                    send("REPLY: ")
+                    send("REPLY: ", end="")
                     body = receive()
                     database.make_post(name, None, body, current_board,
                                        reply=current_thread)
-                    send("Successfully posted.\n")
+                    send("Successfully posted.")
                 else:
-                    send("SUBJECT: ")
+                    send("SUBJECT: ", end="")
                     subject = receive()
-                    send("BODY: ")
+                    send("BODY: ", end="")
                     body = receive()
                     database.make_post(name, subject, body, current_board)
-                    send("Successfully posted.\n")
-        elif command[0] == "send":
-            if len(command) > 1:
-                receiver = command[1]
-            else:
-                send("RECEIVER: ")
-                receiver = receive()
-            if len(command) > 2:
-                message = command[2]
-            else:
-                send("MESSAGE: ")
-                message = receive()
-            if database.send_pm(name, receiver, message):
-                send("Message successfully sent.\n")
-            else:
-                send("User %s does not exist.\n" % receiver)
-        elif command[0] == "inbox":
-            messages = database.get_pms(name)
-            for sender, message, read in messages:
-                read_text = "(*NEW*)" if not read else ""
-                send("%s Message from %s: \"%s\"\n" % (read_text, sender,
-                                                       message))
+                    send("Successfully posted.")
         elif command[0] == "refresh":
             if current_thread:
                 send(box_thread(database.get_posts(current_board,
@@ -162,114 +161,78 @@ def shell(send, receive, name, status, database, config):
                 send(box_boards(boards))
             else:
                 send(box_posts(database.get_posts(current_board)))
+        elif command[0] == "send" and status != "coward":
+            if len(command) > 1:
+                receiver = command[1].lower()
+            else:
+                send("RECEIVER: ", end="")
+                receiver = receive().lower()
+            if len(command) > 2:
+                message = command[2]
+            else:
+                send("MESSAGE: ", end="")
+                message = receive()
+            if database.send_pm(name, receiver, message):
+                send("Message successfully sent.")
+            else:
+                send("User %s does not exist." % receiver)
+        elif command[0] == "inbox" and status != "coward":
+            messages = database.get_pms(name)
+            for sender, message, timesent, read in messages:
+                read_text = "(*NEW*) " if not read else ""
+                send("%s[%s] Message from %s: \"%s\"" % (read_text,
+                                                         time.ctime(timesent),
+                                                         sender, message))
         elif command[0] == "delete" and status == "sysop":
             if len(command) > 1:
                 target = int(command[1])
             else:
-                send("POST ID: ")
+                send("POST ID: ", end="")
                 target = receive()
             database.delete_post(target)
-            send("Post %d successfully deleted.\n" % target)
+            send("Post %d successfully deleted." % target)
         elif command[0] == "ban" and status == "sysop":
             if len(command) > 1:
                 target = command[1]
             else:
-                send("USER: ")
+                send("USER: ", end="")
                 target = receive()
             if len(command) > 2:
                 reason = command[2]
             else:
-                send("REASON: ")
+                send("REASON: ", end="")
                 reason = receive()
             if database.ban_user(reason, username=target):
-                send("User %s successfully banned.\n" % target)
+                send("User %s successfully banned." % target)
             else:
-                send("User %s does not exist.\n" % target)
+                send("User %s does not exist." % target)
         elif command[0] == "unban" and status == "sysop":
             if len(command) > 1:
                 target = command[1]
             else:
-                send("USER: ")
+                send("USER: ", end="")
                 target = receive()
             database.unban_user(username=target)
-            send("User %s successfully unbanned.\n" % target)
+            send("User %s successfully unbanned." % target)
         elif command[0] == "op" and status == "sysop":
             if len(command) > 1:
                 target = command[1]
             else:
-                send("USER: ")
+                send("USER: ", end="")
                 target = receive()
             database.make_op(target)
-            send("User %s successfully sysop'd.\n" % target)
+            send("User %s successfully sysop'd." % target)
         elif command[0] == "deop" and status == "sysop":
             if len(command) > 1:
                 target = command[1]
             else:
-                send("USER: ")
+                send("USER: ", end="")
                 target = receive()
             database.remove_op(target)
-            send("User %s successfully deop'd.\n" % target)
+            send("User %s successfully deop'd." % target)
         else:
             try:
-                send("Unknown command %s.\n" % " ".join(command))
+                send("Unknown command %s." % " ".join(command))
             except OSError:
                 break
-    send(config.get("messages", "quit") + "\n")
-
-def login(send, receive, client, database):
-    """Provides the connected client with a login prompt, from which they can 
-    log into an existing account, create a new one, or choose to browse 
-    anonymously.
-    """
-    send("=" * 23 + "\nPLEASE SELECT AN OPTION\n" + "=" * 23
-         + "\nLOGIN\t\tLogin to an existing account.\nREGISTER\tCreate a new "
-         "account onthis BBS.\nANONYMOUS\tUse the BBS anonymously.\nQUIT\t\t"
-         "Exit the BBS.\n")
-    while True:
-        send("--> ")
-        try:
-            command = receive().lower()
-        except (UnicodeDecodeError, AttributeError):
-            name = status = None
-            break
-        if command == "login":
-            send("USERNAME: ")
-            name = receive()
-            send("PASSWORD: ")
-            password = receive().encode()
-            status, last_login = database.attempt_login(name, password)
-            if status and last_login:
-                send("Successfully logged in as %s.\nLast Login: %s.\nPosts "
-                     "since then: %d.\nYou have %d new messages.\n" %
-                     (name, time.ctime(last_login),
-                      database.get_post_count(last_login=last_login),
-                      database.get_pm_count(name)))
-                break
-            else:
-                send("Invalid login credentials.\n")
-        elif command == "register":
-            send("USERNAME: ")
-            name = receive()
-            status = "sysop" if name in database.operators else "user"
-            send("PASSWORD: ")
-            password = receive()
-            send("CONFIRM PASSWORD: ")
-            if receive() != password:
-                send("Passwords do not match.\n")
-                continue
-            elif database.create_user(name, password.encode()):
-                send("Account successfully created: %s.\n" % name)
-                break
-            else:
-                send("Account already exists.\n")
-        elif command == "anonymous":
-            name = "Anonymous"
-            send("Don't make trouble...\n")
-            status = "coward"
-            break
-        elif command == "quit":
-            name = status = None
-            break
-        else:
-            send("Invalid command \"%s\".\n" % command)
-    return name, status
+    send(config.get("messages", "quit"))

@@ -1,22 +1,24 @@
 ![Asciichan](https://raw.github.com/TsarFox/asciichan/master/Asciichan_Logo.png "Asciichan")
-=====
+=========
 ## Server software programmed and maintained by [Jakob.](http://tsar-fox.com/)
-Asciichan is a simple BBS server written in Python. It is designed to work on both Python2 and Python3.
+Asciichan is a simple text-based BBS server written in Python. It is designed to work with both major versions of Python.
 
 Asciichan is free software, licensed under the GNU Affero General Public License.
 
-=============
+[![Build Status](https://travis-ci.org/TsarFox/asciichan.svg?branch=master)](https://travis-ci.org/TsarFox/asciichan)  [![PyPI Downloads](https://img.shields.io/pypi/dm/Asciichan.svg)](https://pypi.python.org/pypi/Asciichan/)  [![License](https://img.shields.io/github/license/tsarfox/asciichan.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
+
+
 Main Features
 =============
 
-* Users have the option of making an account, or using the BBS anonymously.
-* A private message system is available for registered users.
-* Moderation is easy, sysops can easily delete posts and ban user accounts.
-* Ability to run as a daemon.
+* Users can either sign up for an account, or use the BBS anonymously.
+* Remote moderation is simple, operators should have little trouble deleting posts and banning users.
+* Fully-featured private messaging system for registered users.
+* The server process is easily daemonized.
 
-============
+
 Installation
-============
+------------
 
 Currently, the most reliable way to install the Asciichan server is through Pip.
 
@@ -25,9 +27,9 @@ Currently, the most reliable way to install the Asciichan server is through Pip.
 
     $ pip install --upgrade asciichan
 
-========
+
 Tutorial
-========
+--------
 
 The server can be invoked with the following.
 
@@ -41,9 +43,13 @@ Regardless of how it is run, the server will attempt to run according to a confi
 
     $ asciichan-server --daemonize -c /home/user/config.ini
 
-=============
+The easiest way to connect to the server is through telnet, although other tools such as Netcat can also be used.
+
+    $ telnet [ip] [port]
+
+
 Configuration
-=============
+-------------
 
 The "config.ini" file allows for aspects of the server to be changed.
 
@@ -53,7 +59,7 @@ The "config.ini" file allows for aspects of the server to be changed.
 * banned - The message that is shown to banned users who attempt to login.
 * quit - Message shown to users when they disconnect from the BBS.
 
-* host - The IP that Asciichan will bind to. "dynamic" will attempt to find your machine's IP in the network and bind to that.
+* host - The IP that Asciichan will bind to.
 * port - The port that the BBS server should bind to.
 * backlog - How many connections Asciichan should accept at any one time.
 * database - The database file that Asciichan should read and write from.
@@ -61,7 +67,7 @@ The "config.ini" file allows for aspects of the server to be changed.
 * boards - Boards on this BBS, separated by comma. A description of the board is specified by adding a colon (:) and the description after the board name.
 * operators - List of usernames to be OP'd automatically, separated by comma.
 
-====
+
 TODO
-====
+----
 - [TODO](/TODO.md)

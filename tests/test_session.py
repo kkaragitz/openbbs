@@ -10,7 +10,8 @@ import asciichan.session
 class IOTest(unittest.TestCase):
     def test_curry_io(self):
         client = tests.dummy_objects.DummyClient()
-        send, receive = asciichan.session.curry_io(client)
+        database = tests.dummy_objects.DummyDatabase()
+        send, receive = asciichan.session.curry_io(client, database, "")
         self.assertTrue(receive())
 
 
