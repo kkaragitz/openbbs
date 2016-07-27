@@ -2,18 +2,16 @@
 
 import time
 
-import asciichan.database
-
 
 def prompt(send, receive, client, database):
     """Provides the connected client with a login prompt, from which they can 
     log into an existing account, create a new one, or choose to browse 
     anonymously.
     """
-    send("=" * 23 + "\r\nPLEASE SELECT AN OPTION\r\n" + "=" * 23
-         + "\r\nLOGIN\t\tLogin to an existing account.\r\nREGISTER\tCreate a "
-         "new account onthis BBS.\r\nANONYMOUS\tUse the BBS anonymously.\r\n"
-         "QUIT\t\tExit the BBS.")
+    send("=======================\r\nPLEASE SELECT AN OPTION\r\n=============="
+         "=========\r\nLOGIN\t\tLogin to an existing account.\r\nREGISTER\t"
+         "Create a new account onthis BBS.\r\nANONYMOUS\tUse the BBS "
+         "anonymously.\r\nQUIT\t\tExit the BBS.")
     while True:
         send("--> ", end="")
         command = receive().lower()
@@ -37,12 +35,13 @@ def prompt(send, receive, client, database):
             name = receive().lower()
             status = "sysop" if name in database.operators else "user"
             send("PASSWORD: ", end="")
-            password = receive()
+            password = receive().encode()
             send("CONFIRM PASSWORD: ", end="")
-            if receive() != password:
+            if receive().encode() != password:
                 send("Passwords do not match.")
                 continue
-            elif database.create_user(name, password.encode()):
+            status = database.create_user(name, password)
+            if status:
                 send("Account successfully created: %s." % name)
                 break
             else:

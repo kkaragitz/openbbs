@@ -4,14 +4,14 @@ import sqlite3
 import os
 import unittest
 
-import asciichan.database
+from asciichan.database import Database
 
 
 class DatabaseCreationTest(unittest.TestCase):
     def setUp(self):
         if os.path.exists("./database.db"):
             os.rename("./database.db", "./database.old.db")
-        self.database = asciichan.database.Database("./database.db", "")
+        self.database = Database("./database.db", "")
 
     def tearDown(self):
         os.remove("./database.db")
@@ -45,7 +45,7 @@ class DatabaseAccountTest(unittest.TestCase):
     def setUp(self):
         if os.path.exists("./database.db"):
             os.rename("./database.db", "./database.old.db")
-        self.database = asciichan.database.Database("./database.db", "")
+        self.database = Database("./database.db", "")
 
     def tearDown(self):
         if os.path.exists("./database.old.db"):
@@ -86,7 +86,7 @@ class DatabasePostTest(unittest.TestCase):
     def setUp(self):
         if os.path.exists("./database.db"):
             os.rename("./database.db", "./database.old.db")
-        self.database = asciichan.database.Database("./database.db", "")
+        self.database = Database("./database.db", "")
         self.database.make_post("jakob", "Hello!", "Test!", "technology")
 
     def tearDown(self):
@@ -116,7 +116,7 @@ class DatabasePMTest(unittest.TestCase):
     def setUp(self):
         if os.path.exists("./database.db"):
             os.rename("./database.db", "./database.old.db")
-        self.database = asciichan.database.Database("./database.db", "")
+        self.database = Database("./database.db", "")
         self.database.create_user("jakob", b"password")
 
     def tearDown(self):

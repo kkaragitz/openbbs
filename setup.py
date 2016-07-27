@@ -53,5 +53,4 @@ setup(name="Asciichan",
           'Topic :: System :: Networking',
           "Topic :: Terminals :: Telnet"
       ],
-      keywords="bbs telnet server"
-     )
+      keywords="bbs telnet server")

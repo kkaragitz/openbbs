@@ -2,5 +2,5 @@
 
 __author__ = "Jakob Tsar-Fox <jakob@memeware.net>"
 __licence__ = "AGPLv3"
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 

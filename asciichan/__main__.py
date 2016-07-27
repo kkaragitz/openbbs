@@ -2,7 +2,9 @@
 """Primary entry point to the Asciichan server."""
 
 import sys
-import asciichan.cli
+
+from asciichan.core import main
+
 
 if __name__ == "__main__":
-    sys.exit(asciichan.cli.main())
+    sys.exit(main())

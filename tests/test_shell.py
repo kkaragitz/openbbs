@@ -2,10 +2,10 @@
 
 import unittest
 
-import tests.dummy_objects
+from tests.dummy_objects import DummyClient
 
-import asciichan.login
-import asciichan.shell
+from asciichan.login import prompt
+from asciichan.shell import (box_boards, box_posts, box_thread)
 
 
 def send(*args, **kwargs):
@@ -20,16 +20,12 @@ def receive(*args):
 
 class FormattersTest(unittest.TestCase):
     def test_box_items(self):
-        self.assertTrue(asciichan.shell.box_boards(["board:description"]))
-        self.assertTrue(asciichan.shell.box_posts([[1, 1.0, "a", "a", "a"]]))
-        self.assertTrue(asciichan.shell.box_thread([[1, 1.0, "a", "a", "a"]]))
+        self.assertTrue(box_boards(["board:description"]))
+        self.assertTrue(box_posts([[1, 1.0, "a", "a", "a"]]))
+        self.assertTrue(box_thread([[1, 1.0, "a", "a", "a"]]))
 
 
 class LoginTest(unittest.TestCase):
     def test_login_prompt(self):
-        self.assertEqual(asciichan.login.prompt(
-            send,
-            receive,
-            tests.dummy_objects.DummyClient(),
-            None
-        ), (None, None))
+        self.assertEqual(prompt(send, receive, DummyClient(), None),
+                         (None, None))

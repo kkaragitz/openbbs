@@ -20,7 +20,7 @@ class DummyDatabase(object):
 
 class DummyConfig(object):
     """Dummy config to test sessions."""
-    def get(self, *args):
+    def get(self, *args, **kwargs):
         if args[1] == "database":
             return "database.db"
         elif args[1] == "operators":

@@ -33,7 +33,7 @@ class Database(object):
         and password if it does not already exist. Returns True if the entry
         was successfully created.
         """
-        self.cursor.execute("SELECT * FROM users WHERE username=?;",
+        self.cursor.execute("SELECT * FROM users WHERE username = ?;",
                             (username,))
         if not self.cursor.fetchone():
             status = "sysop" if username in self.operators else "user"
@@ -43,14 +43,14 @@ class Database(object):
                                  hashlib.sha256(password).hexdigest(),
                                  time.time()))
             self.connection.commit()
-            return True
+            return status
 
     def attempt_login(self, username, password):
         """Return the user_status if the given username matches the given 
         password in the users table, otherwise returns None.
         """
         self.cursor.execute("SELECT user_status, last_login FROM users "
-                            "WHERE username=? AND password=?;",
+                            "WHERE username = ? AND password = ?;",
                             (username,
                              hashlib.sha256(password).hexdigest()))
         result = self.cursor.fetchone()
@@ -60,7 +60,7 @@ class Database(object):
             if result[0] == "user" and username in self.operators:
                 self.cursor.execute("UPDATE users SET user_status = 'sysop' "
                                     "WHERE username = ?;", (username,))
-                result = ("sysop", result[1]) # This is not good.
+                result = ("sysop", result[1])
             self.cursor.execute("UPDATE users SET last_login = ? WHERE "
                                 "username = ?;", (time.time(), username))
             self.connection.commit()
@@ -70,17 +70,16 @@ class Database(object):
         """Query the database to see if a given username or IP is banned, and
         return the reason if it is.
         """
-        self.cursor.execute("SELECT reason FROM bans WHERE username=? OR "
-                            "ip=?;", (username, ip))
+        self.cursor.execute("SELECT reason FROM bans WHERE username = ? OR "
+                            "ip = ?;", (username, ip))
         value = self.cursor.fetchone()
-        if value:
-            return value[0]
+        return value[0] if value else None
 
     def ban_user(self, reason, username=None, ip=None):
         """Adds a username/ip and ban reason to the bans table, returning true
         if the operation was successful.
         """
-        self.cursor.execute("SELECT * FROM bans WHERE username=?;",
+        self.cursor.execute("SELECT * FROM bans WHERE username = ?;",
                             (username,))
         if not self.cursor.fetchone() or not username:
             self.cursor.execute("INSERT INTO bans (username, ip, reason) "
@@ -92,26 +91,26 @@ class Database(object):
         """Removes a username/ip from the bans table, returning true if the 
         operation was successful.
         """
-        self.cursor.execute("DELETE FROM bans WHERE username=? OR ip=?;",
+        self.cursor.execute("DELETE FROM bans WHERE username = ? OR ip = ?;",
                             (username,ip))
         self.connection.commit()
 
     def make_op(self, username):
         """Makes the given user a sysop on the BBS."""
-        self.cursor.execute("UPDATE users SET user_status='sysop' WHERE "
-                            "username=?;", (username,))
+        self.cursor.execute("UPDATE users SET user_status = 'sysop' WHERE "
+                            "username = ?;", (username,))
         self.connection.commit()
 
     def remove_op(self, username):
         """Makes the given user a standard user on the BBS."""
-        self.cursor.execute("UPDATE users SET user_status='user' WHERE "
-                            "username=?;", (username,))
+        self.cursor.execute("UPDATE users SET user_status = 'user' WHERE "
+                            "username = ?;", (username,))
         self.connection.commit()
 
 
     def delete_post(self, post_id):
         """Deletes the given post id."""
-        self.cursor.execute("DELETE FROM posts WHERE post_id=?;", (post_id,))
+        self.cursor.execute("DELETE FROM posts WHERE post_id = ?;", (post_id,))
         self.connection.commit()
 
     def get_post_count(self, board=None, last_login=0):
@@ -120,11 +119,11 @@ class Database(object):
         board.
         """
         if board:
-            self.cursor.execute("SELECT COUNT(post_id) FROM posts WHERE board=? "
-                                "AND time>?;", (board, last_login))
+            self.cursor.execute("SELECT COUNT(post_id) FROM posts WHERE board "
+                                "= ? AND time > ?;", (board, last_login))
         else:
-            self.cursor.execute("SELECT COUNT(post_id) FROM posts WHERE time>?;",
-                                (last_login,))
+            self.cursor.execute("SELECT COUNT(post_id) FROM posts WHERE time "
+                                "> ?;", (last_login,))
         try:
             count = self.cursor.fetchone()[0]
         except TypeError:
@@ -135,11 +134,11 @@ class Database(object):
         """Returns a list of  all of the posts for a given board."""
         if thread:
             self.cursor.execute("SELECT post_id, time, name, subject, body "
-                                "FROM posts WHERE post_id=? OR reply=? ORDER "
-                                "BY post_id ASC;", (thread, thread))
+                                "FROM posts WHERE post_id = ? OR reply = ? "
+                                "ORDER BY post_id ASC;", (thread, thread))
         else:
             self.cursor.execute("SELECT post_id, time, name, subject, body "
-                                "FROM posts WHERE board=? AND reply IS NULL "
+                                "FROM posts WHERE board = ? AND reply IS NULL "
                                 "ORDER BY post_id DESC;", (board,))
         return self.cursor.fetchall()
 
@@ -154,7 +153,7 @@ class Database(object):
         """Generate a database entry for a private message with the given 
         sender, receiver and message if the receiver exists.
         """
-        self.cursor.execute("SELECT user_id FROM users WHERE username=?;",
+        self.cursor.execute("SELECT user_id FROM users WHERE username = ?;",
                             (receiver,))
         if self.cursor.fetchone():
             self.cursor.execute("INSERT INTO pms (sender, receiver, message, "
@@ -165,17 +164,17 @@ class Database(object):
 
     def get_pm_count(self, receiver):
         """Get the number of PM's in the receiver's inbox."""
-        self.cursor.execute("SELECT COUNT(*) FROM pms WHERE receiver=? AND "
-                            "read=0;", (receiver,))
+        self.cursor.execute("SELECT COUNT(*) FROM pms WHERE receiver = ? AND "
+                            "read = 0;", (receiver,))
         return self.cursor.fetchone()[0]
 
     def get_pms(self, receiver):
         """Get all of the PM's sent to the given receiver."""
         self.cursor.execute("SELECT sender, message, time, read FROM pms "
-                            "WHERE receiver=? ORDER BY time DESC;",
+                            "WHERE receiver = ? ORDER BY time DESC;",
                             (receiver,))
         messages = self.cursor.fetchall()
-        self.cursor.execute("UPDATE pms SET read=1 WHERE receiver=?;",
+        self.cursor.execute("UPDATE pms SET read = 1 WHERE receiver = ?;",
                             (receiver,))
         self.connection.commit()
         return messages

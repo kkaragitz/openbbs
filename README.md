@@ -53,12 +53,14 @@ Configuration
 
 The "config.ini" file allows for aspects of the server to be changed.
 
+*[messages]*
 * name - Change the name that the server will identify as.
 * motd - Supply a message to be sent to newly-connected clients.
 * rules - A list of rules to be shown to users who run the "rules" command.
 * banned - The message that is shown to banned users who attempt to login.
 * quit - Message shown to users when they disconnect from the BBS.
 
+*[server]*
 * host - The IP that Asciichan will bind to.
 * port - The port that the BBS server should bind to.
 * backlog - How many connections Asciichan should accept at any one time.
