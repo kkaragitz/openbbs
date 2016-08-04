@@ -6,6 +6,9 @@ import time
 
 
 class Database(object):
+    """Model and controller implementation for the BBS. Class
+    representation of a connection to the database.
+    """
     def __init__(self, database, operators):
         self.operators = operators.split(",")
         self.connection  = sqlite3.connect(database)

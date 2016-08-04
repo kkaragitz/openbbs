@@ -13,10 +13,10 @@ Your contribution should follow [PEP 8 Guidelines](https://www.python.org/dev/pe
 
 Tests are done in Tox, which is run from the repository's root directory. Please write unittests for anything you add.
 
-Feel free to add yourself to the AUTHORS.md file, you deserve credit for your contributions.
+Feel free to add yourself to the AUTHORS.md file.
 
 
 Feature Requests
 ----------------
 
-Please don't open an issue for it. Get in contact with the [Project Maintainer](http://tsar-fox.com/), or if you can - implement it yourself.
+Open a Github issue with the "feature_request" label, or get in contact with the [Project Maintainer](http://tsar-fox.com/) if you are not a Github user.

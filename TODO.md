@@ -1,5 +1,6 @@
 =====================
 By Next Minor Release
 =====================
-* Implement a means of banning IP's from the BBS shell.
-* See if there are better ways of ending the thread if the client sends a ^C.
+* Attempt to decouple the shell session, as of right now it's a big spaghetti mess.
+* Find a replacement to the fallback kwarg for configparser's "get" method that works with Python2.
+* Improve upon code test coverage.

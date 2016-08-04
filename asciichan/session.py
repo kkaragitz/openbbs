@@ -22,8 +22,7 @@ def curry_io(client, database, ip):
 
     def receive():
         try:
-            response = client.recv(1024).decode().strip()
-            return response
+            return client.recv(1024).decode().strip()
         except (OSError, UnicodeDecodeError, AttributeError):
             logging.warning("Client connection has been interrupted.")
             close(client, database, ip)
@@ -33,7 +32,7 @@ def curry_io(client, database, ip):
 
 
 def close(client, database, ip):
-    """Safely close data related to the current session."""
+    """Safely close a session and clean up."""
     client.close()
     database.close()
     logging.info("Connection to %s has been closed.", ip)

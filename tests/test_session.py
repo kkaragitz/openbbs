@@ -9,7 +9,7 @@ from asciichan.session import (curry_io, handle)
 
 class IOTest(unittest.TestCase):
     def test_curry_io(self):
-        client = tests.dummy_objects.DummyClient()
+        client = tests.dummy_objects.DummyClient(b"a")
         database = tests.dummy_objects.DummyDatabase()
         send, receive = curry_io(client, database, "")
         self.assertTrue(receive())
@@ -17,7 +17,7 @@ class IOTest(unittest.TestCase):
 
 class ClientHandler(unittest.TestCase):
     def setUp(self):
-        self.client = tests.dummy_objects.DummyClient()
+        self.client = tests.dummy_objects.DummyClient(b"quit")
         self.config = tests.dummy_objects.DummyConfig()
 
     def test_handler(self):

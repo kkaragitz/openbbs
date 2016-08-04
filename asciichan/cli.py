@@ -1,4 +1,4 @@
-"""Entry point to the Asciichan server process."""
+"""Argument definitions for invokation from the command-line."""
 
 import argparse
 
@@ -41,7 +41,7 @@ docs.add_argument(
     "-v",
     "--version",
     action="version",
-    version="Asciichan Server Version %s." % __version__,
+    version="Asciichan Server, Version %s." % __version__,
     help="Display the currently installed version and exit."
 )
 

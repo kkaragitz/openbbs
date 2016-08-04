@@ -1,20 +1,19 @@
 ![Asciichan](https://raw.github.com/TsarFox/asciichan/master/Asciichan_Logo.png "Asciichan")
 =========
 ## Server software programmed and maintained by [Jakob.](http://tsar-fox.com/)
-Asciichan is a simple text-based BBS server written in Python. It is designed to work with both major versions of Python.
+Asciichan is a simple text-based BBS server written in Python, designed to work with both major versions of Python. Its goal is to be easily accessible to anyone with Netcat or a Telnet client.
 
 Asciichan is free software, licensed under the GNU Affero General Public License.
 
 [![Build Status](https://travis-ci.org/TsarFox/asciichan.svg?branch=master)](https://travis-ci.org/TsarFox/asciichan)  [![PyPI Downloads](https://img.shields.io/pypi/dm/Asciichan.svg)](https://pypi.python.org/pypi/Asciichan/)  [![License](https://img.shields.io/github/license/tsarfox/asciichan.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 
 
-Main Features
-=============
+Primary Features
+================
 
 * Users can either sign up for an account, or use the BBS anonymously.
-* Remote moderation is simple, operators should have little trouble deleting posts and banning users.
+* Remote moderation is simple, operators should have little to  no trouble deleting posts and banning users.
 * Fully-featured private messaging system for registered users.
-* The server process is easily daemonized.
 
 
 Installation
@@ -45,7 +44,8 @@ Regardless of how it is run, the server will attempt to run according to a confi
 
 The easiest way to connect to the server is through telnet, although other tools such as Netcat can also be used.
 
-    $ telnet [ip] [port]
+    $ telnet [ip] [port] # Alternatively, "nc [ip] [port]" if you prefer to use Netcat.
+    ...
 
 
 Configuration
@@ -67,7 +67,7 @@ The "config.ini" file allows for aspects of the server to be changed.
 * database - The database file that Asciichan should read and write from.
 * logfile - Specify a logfile to write to. If left blank, log messages will be written to stdout.
 * boards - Boards on this BBS, separated by comma. A description of the board is specified by adding a colon (:) and the description after the board name.
-* operators - List of usernames to be OP'd automatically, separated by comma.
+* operators - List of usernames to be given operator automatically, separated by comma. Changes will take effect when they register or login.
 
 
 TODO

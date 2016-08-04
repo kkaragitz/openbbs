@@ -33,7 +33,6 @@ def prompt(send, receive, client, database):
         elif command == "register":
             send("USERNAME: ", end="")
             name = receive().lower()
-            status = "sysop" if name in database.operators else "user"
             send("PASSWORD: ", end="")
             password = receive().encode()
             send("CONFIRM PASSWORD: ", end="")
@@ -45,15 +44,15 @@ def prompt(send, receive, client, database):
                 send("Account successfully created: %s." % name)
                 break
             else:
-                send("Account already exists.")
+                send("Account already exists, or could not be made.")
         elif command == "anonymous":
             name = "Anonymous"
-            send("Don't make trouble...")
             status = "coward"
+            send("Don't make trouble...")
             break
         elif command == "quit":
             name = status = None
             break
         else:
             send("Invalid command \"%s\"." % command)
-    return name, status
+    return (name, status)

@@ -86,7 +86,9 @@ def shell(send, receive, name, status, database, config):
             if status == "sysop":
                 send("DELETE\t\tDelete a post\r\n"
                      "BAN\t\tBan a username.\r\n"
+                     "BANIP\t\tBan an IP.\r\n"
                      "UNBAN\t\tUnban a username.\r\n"
+                     "UNBANIP\t\tUnban an IP.\r\n"
                      "OP\t\tGive a user operator privileges.\r\n"
                      "DEOP\t\tRevoke operator privileges from a user.")
         elif command[0] == "quit":
@@ -94,27 +96,28 @@ def shell(send, receive, name, status, database, config):
         elif command[0] == "rules":
             send(config.get("messages", "rules", fallback=""))
         elif command[0] == "info":
-            send("Asciichan-BBS Server Version %s. Released under the Affero "
-                 "General Public\r\nLicense Version 3+." % __version__)
+            send("Asciichan-BBS Server Version %s.\r\nReleased under the "
+                 "GNU Affero General Public License Version 3+." % __version__)
         elif command[0] == "board":
             if len(command) > 1:
                 board = command[1]
             else:
-                send("BOARD: ", end="")
+                send("Leave empty to return to the overboard.\r\nBOARD: ",
+                     end="")
                 board = receive().lower()
             if board in (board.split(":")[0].lower() for board in boards):
                 current_board = board
                 send(box_posts(database.get_posts(current_board)))
                 send("Board successfully changed to \"%s\"." % board)
-            elif board == "main" or board == "":
+            elif board == "":
                 current_board = "main"
                 send(box_boards(boards))
-                send("Board successfully changed to Main.")
+                send("Successfully returned to the overboard.")
             else:
                 send("Board \"%s\" does not exist on this BBS." % board)
         elif command[0] == "thread":
             if current_board == "main":
-                send("There are no threads here.\r\n")
+                send("There are no threads here.")
             elif len(command) > 1:
                 current_thread = command[1]
             else:
@@ -122,20 +125,20 @@ def shell(send, receive, name, status, database, config):
                      "NUMBER: ", end="")
                 current_thread = receive()
             if current_thread == "":
+                current_thread = None
                 send(box_posts(database.get_posts(current_board)))
                 send("Successfully returned to the %s home." % current_board)
-                current_thread = None
             else:
                 posts = database.get_posts(current_board, current_thread)
                 if posts:
                     send(box_thread(posts))
                     send("Current thread changed to %s." % current_thread)
                 else:
-                    send("Thread %s does not exist." % current_thread)
                     current_thread = None
+                    send("Thread %s does not exist." % current_thread)
         elif command[0] == "post":
             if current_board == "main":
-                send("You can't post here.")
+                send("You can't post on the overboard.")
             else:
                 if current_thread:
                     send("REPLY: ", end="")
@@ -203,6 +206,21 @@ def shell(send, receive, name, status, database, config):
                 send("User %s successfully banned." % target)
             else:
                 send("User %s does not exist." % target)
+        elif command[0] == "banip" and status == "sysop": ##
+            if len(command) > 1:
+                target = command[1]
+            else:
+                send("IP: ", end="")
+                target = receive()
+            if len(command) > 2:
+                reason = command[2]
+            else:
+                send("REASON: ", end="")
+                reason = receive()
+            if database.ban_user(reason, ip=target):
+                send("IP %s successfully banned." % target)
+            else:
+                send("IP %s could not be banned." % target)
         elif command[0] == "unban" and status == "sysop":
             if len(command) > 1:
                 target = command[1]
@@ -211,6 +229,14 @@ def shell(send, receive, name, status, database, config):
                 target = receive()
             database.unban_user(username=target)
             send("User %s successfully unbanned." % target)
+        elif command[0] == "unbanip" and status == "sysop":
+            if len(command) > 1:
+                target = command[1]
+            else:
+                send("IP: ", end="")
+                target = receive()
+            database.unban_user(ip=target)
+            send("IP %s successfully unbanned." % target)
         elif command[0] == "op" and status == "sysop":
             if len(command) > 1:
                 target = command[1]
