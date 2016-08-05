@@ -1,6 +1,9 @@
 """Interfaces to the BBS's model representation."""
 
+import binascii
 import hashlib
+import random
+import string
 import sqlite3
 import time
 
@@ -21,8 +24,8 @@ class Database(object):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS users (user_id INTEGER"
                             " PRIMARY KEY AUTOINCREMENT NOT NULL, username "
                             "TEXT NOT NULL, user_status TEXT NOT NULL, "
-                            "password TEXT NOT NULL, last_login INTEGER NOT "
-                            "NULL);")
+                            "password TEXT NOT NULL, salt TEXT NOT NULL, "
+                            "last_login INTEGER NOT NULL);")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS bans (ban_no INTEGER"
                             " PRIMARY KEY AUTOINCREMENT NOT NULL, username "
                             "TEXT, ip TEXT, reason TEXT NOT NULL);")
@@ -39,11 +42,13 @@ class Database(object):
         self.cursor.execute("SELECT * FROM users WHERE username = ?;",
                             (username,))
         if not self.cursor.fetchone():
+            salt = "".join(random.choice(string.printable) for i in range(64))
             status = "sysop" if username in self.operators else "user"
+            dk = hashlib.pbkdf2_hmac("sha512", password, salt.encode(), 500000)
             self.cursor.execute("INSERT INTO users (username, user_status, "
-                                "password, last_login) VALUES (?, ?, ?, ?);",
-                                (username, status,
-                                 hashlib.sha256(password).hexdigest(),
+                                "password, salt, last_login) VALUES "
+                                "(?, ?, ?, ?, ?);",
+                                (username, status, binascii.hexlify(dk), salt,
                                  time.time()))
             self.connection.commit()
             return status
@@ -52,10 +57,13 @@ class Database(object):
         """Return the user_status if the given username matches the given 
         password in the users table, otherwise returns None.
         """
+        self.cursor.execute("SELECT salt FROM users WHERE username = ?;",
+                            (username,))
+        salt = self.cursor.fetchone()[0]
+        dk = hashlib.pbkdf2_hmac("sha512", password, salt.encode(), 500000)
         self.cursor.execute("SELECT user_status, last_login FROM users "
                             "WHERE username = ? AND password = ?;",
-                            (username,
-                             hashlib.sha256(password).hexdigest()))
+                            (username, binascii.hexlify(dk)))
         result = self.cursor.fetchone()
         if result is None:
             result = (None, None)
