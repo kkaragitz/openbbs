@@ -1,5 +1,6 @@
-#!/usr/bin/python
-"""Primary entry point to the Asciichan server."""
+#!/usr/bin/env python
+
+"""Command-line entry point to the Asciichan server."""
 
 import sys
 

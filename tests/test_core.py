@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
 import logging
 import socket
 import threading
@@ -31,4 +25,3 @@ class ServerSpawnTest(unittest.TestCase):
         with self.assertRaises(SystemExit):
             spawn_server(self.config, True)
         self.config.remove_section("server")
-

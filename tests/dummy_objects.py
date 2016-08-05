@@ -41,12 +41,4 @@ class DummyDatabase(object):
         return 1
 
 
-class DummyConfig(object):
-    """Dummy config to test sessions."""
-    def get(self, *args, **kwargs):
-        if args[1] == "database":
-            return "database.db"
-        elif args[1] == "operators":
-            return ""
-        elif args[1] == "motd":
-            return "This is a test MOTD."
+dummy_config = lambda section option fallback: return fallback

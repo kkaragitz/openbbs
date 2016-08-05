@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
 import unittest
 
 from tests.dummy_objects import (DummyClient, DummyDatabase)

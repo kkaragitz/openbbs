@@ -1,4 +1,4 @@
-"""Module containing everything required to access the BBS database."""
+"""Interfaces to the BBS's model representation."""
 
 import hashlib
 import sqlite3

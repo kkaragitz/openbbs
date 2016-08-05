@@ -1,7 +1,7 @@
 ![Asciichan](https://raw.github.com/TsarFox/asciichan/master/Asciichan_Logo.png "Asciichan")
 =========
 ## Server software programmed and maintained by [Jakob.](http://tsar-fox.com/)
-Asciichan is a simple text-based BBS server written in Python, designed to work with both major versions of Python. Its goal is to be easily accessible to anyone with Netcat or a Telnet client.
+Asciichan is a simple text-based BBS server written in Python. Its goal is to be easily accessible to anyone with Netcat or a Telnet client, and functional on both major versions of Python.
 
 Asciichan is free software, licensed under the GNU Affero General Public License.
 

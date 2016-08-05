@@ -54,16 +54,16 @@ def box_thread(posts):
     return string
 
 
-def shell(send, receive, name, status, database, config):
+def shell(send, receive, name, status, database, config_get):
     """Handles basic commands from the currently connected client."""
-    boards = config.get("server", "boards", fallback="test:test").split(",")
+    boards = config_get("server", "boards", default="test:test").split(",")
     current_board = "main"
     current_thread = None
     send(box_boards(boards))
     send("Enter \"HELP\" to see available commands.")
     while True:
-        send("[%s@%s %s]$ " % (name, config.get("messages", "name",
-                                                fallback="Asciichan-BBS"),
+        send("[%s@%s %s]$ " % (name, config_get("messages", "name",
+                                                default="Asciichan-BBS"),
                                current_board), end="")
         try:
             command = receive().lower().split(" ")
@@ -94,7 +94,7 @@ def shell(send, receive, name, status, database, config):
         elif command[0] == "quit":
             break
         elif command[0] == "rules":
-            send(config.get("messages", "rules", fallback=""))
+            send(config_get("messages", "rules", default=""))
         elif command[0] == "info":
             send("Asciichan-BBS Server Version %s.\r\nReleased under the "
                  "GNU Affero General Public License Version 3+." % __version__)
@@ -258,4 +258,4 @@ def shell(send, receive, name, status, database, config):
                 send("Unknown command %s." % " ".join(command))
             except OSError:
                 break
-    send(config.get("messages", "quit", fallback="Goodbye!"))
+    send(config_get("messages", "quit", default="Goodbye!"))
