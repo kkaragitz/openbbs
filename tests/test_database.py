@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import time
 import unittest
 
 from asciichan.database import Database
@@ -54,11 +55,14 @@ class DatabaseAccountTest(unittest.TestCase):
         self.database.cursor.execute("SELECT * FROM users WHERE "
                                      "username='jakob';")
         self.assertTrue(self.database.cursor.fetchone())
+        self.assertFalse(self.database.create_user("jakob", b"memes"))
 
     def test_login_user(self):
         self.database.create_user("jakob", b"memes")
         self.assertTrue(self.database.attempt_login("jakob", b"memes"))
         self.assertEqual(self.database.attempt_login("jakob", b"nenes"),
+                         (None, None))
+        self.assertEqual(self.database.attempt_login("kakob", b"nenes"),
                          (None, None))
 
     def test_login_new_op(self):
@@ -115,9 +119,9 @@ class DatabasePostTest(unittest.TestCase):
     def test_get_total_post_count(self):
         self.assertEqual(self.database.get_post_count(), 1)
 
-    def test_get_board_post_count(self):
-        self.assertEqual(self.database.get_post_count("technology"), 1)
-        self.assertEqual(self.database.get_post_count("random"), 0)
+    def test_get_timed_post_count(self):
+        self.assertEqual(self.database.get_post_count(0), 1)
+        self.assertEqual(self.database.get_post_count(time.time() + 500), 0)
 
     def test_delete_post(self):
         self.database.delete_post(1)

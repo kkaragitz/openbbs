@@ -7,6 +7,7 @@ This project uses the semantic versioning scheme.
 **Version 0.2.0**
 -----------------
 * Implemented a means of banning IP's from the interface.
+* Fixed config.ini parsing on Python2.
 
 
 **Version 0.1.1**

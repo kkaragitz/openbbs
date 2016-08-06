@@ -2,33 +2,37 @@
 
 import binascii
 import hashlib
+import os
 import random
 import string
 import sqlite3
 import time
 
+CHARS = string.printable
+HASH_ITERATIONS = 500000
+SALT_LENGTH = 64
+
 
 class Database(object):
-    """Model and controller implementation for the BBS. Class
-    representation of a connection to the database.
-    """
+    """Model and controller implementation for the BBS."""
     def __init__(self, database, operators):
         self.operators = operators.split(",")
         self.connection  = sqlite3.connect(database)
         self.cursor = self.connection.cursor()
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS posts (post_id INTEGER"
-                            " PRIMARY KEY AUTOINCREMENT NOT NULL, time INTEGER"
-                            " NOT NULL, board TEXT NOT NULL, name TEXT NOT "
-                            "NULL, subject TEXT, body TEXT NOT NULL, reply "
-                            "INTEGER);")
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS users (user_id INTEGER"
-                            " PRIMARY KEY AUTOINCREMENT NOT NULL, username "
-                            "TEXT NOT NULL, user_status TEXT NOT NULL, "
-                            "password TEXT NOT NULL, salt TEXT NOT NULL, "
-                            "last_login INTEGER NOT NULL);")
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS bans (ban_no INTEGER"
-                            " PRIMARY KEY AUTOINCREMENT NOT NULL, username "
-                            "TEXT, ip TEXT, reason TEXT NOT NULL);")
+
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS posts (post_id "
+                            "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, time "
+                            "INTEGER NOT NULL, board TEXT NOT NULL, name TEXT "
+                            "NOT NULL, subject TEXT, body TEXT NOT NULL, "
+                            "reply INTEGER);")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS users (user_id "
+                            "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                            "username TEXT NOT NULL, user_status TEXT NOT "
+                            "NULL, password TEXT NOT NULL, salt TEXT NOT "
+                            "NULL, last_login INTEGER NOT NULL);")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS bans (ban_no "
+                            "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                            "username TEXT, ip TEXT, reason TEXT NOT NULL);")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS pms (sender TEXT NOT "
                             "NULL, receiver TEXT NOT NULL, message TEXT NOT "
                             "NULL, time INTEGER NOT NULL, read INTEGER NOT "
@@ -39,19 +43,23 @@ class Database(object):
         and password if it does not already exist. Returns True if the entry
         was successfully created.
         """
-        self.cursor.execute("SELECT * FROM users WHERE username = ?;",
+        self.cursor.execute("SELECT user_id FROM users WHERE username = ?;",
                             (username,))
         if not self.cursor.fetchone():
-            salt = "".join(random.choice(string.printable) for i in range(64))
             status = "sysop" if username in self.operators else "user"
-            dk = hashlib.pbkdf2_hmac("sha512", password, salt.encode(), 500000)
+            source = random.SystemRandom(int(time.time()) | os.getpid())
+            salt = "".join(source.choice(CHARS) for _ in range(SALT_LENGTH))
+            dk = hashlib.pbkdf2_hmac("sha512", password, salt.encode(),
+                                     HASH_ITERATIONS)
             self.cursor.execute("INSERT INTO users (username, user_status, "
                                 "password, salt, last_login) VALUES "
                                 "(?, ?, ?, ?, ?);",
                                 (username, status, binascii.hexlify(dk), salt,
                                  time.time()))
             self.connection.commit()
-            return status
+        else:
+            status = None
+        return status
 
     def attempt_login(self, username, password):
         """Return the user_status if the given username matches the given 
@@ -59,23 +67,32 @@ class Database(object):
         """
         self.cursor.execute("SELECT salt FROM users WHERE username = ?;",
                             (username,))
-        salt = self.cursor.fetchone()[0]
-        dk = hashlib.pbkdf2_hmac("sha512", password, salt.encode(), 500000)
-        self.cursor.execute("SELECT user_status, last_login FROM users "
-                            "WHERE username = ? AND password = ?;",
-                            (username, binascii.hexlify(dk)))
         result = self.cursor.fetchone()
-        if result is None:
-            result = (None, None)
-        else:
-            if result[0] == "user" and username in self.operators:
+        if result:
+            salt = result[0]
+            dk = hashlib.pbkdf2_hmac("sha512", password, salt.encode(),
+                                     500000)
+            self.cursor.execute("SELECT user_status, last_login FROM users "
+                                "WHERE username = ? AND password = ?;",
+                                (username, binascii.hexlify(dk)))
+            result = self.cursor.fetchone()
+            # FIXME: Redundant. <jakob@memeware.net>
+            if result:
+                status, last_login = result
+            else:
+                status = last_login = None
+            if status == "user" and username in self.operators:
                 self.cursor.execute("UPDATE users SET user_status = 'sysop' "
                                     "WHERE username = ?;", (username,))
-                result = ("sysop", result[1])
-            self.cursor.execute("UPDATE users SET last_login = ? WHERE "
-                                "username = ?;", (time.time(), username))
-            self.connection.commit()
-        return result
+                self.connection.commit()
+                status = "sysop"
+            if status is not None:
+                self.cursor.execute("UPDATE users SET last_login = ? WHERE "
+                                    "username = ?;", (time.time(), username))
+                self.connection.commit()
+        else:
+            status = last_login = None
+        return (status, last_login)
 
     def check_banned(self, username, ip):
         """Query the database to see if a given username or IP is banned, and
@@ -90,20 +107,16 @@ class Database(object):
         """Adds a username/ip and ban reason to the bans table, returning true
         if the operation was successful.
         """
-        self.cursor.execute("SELECT * FROM bans WHERE username = ?;",
-                            (username,))
-        if not self.cursor.fetchone() or not username:
-            self.cursor.execute("INSERT INTO bans (username, ip, reason) "
-                                "VALUES (?, ?, ?);", (username, ip, reason))
-            self.connection.commit()
-            return True
+        self.cursor.execute("INSERT INTO bans (username, ip, reason) VALUES "
+                            "(?, ?, ?);", (username, ip, reason))
+        self.connection.commit()
 
     def unban_user(self, username=None, ip=None):
         """Removes a username/ip from the bans table, returning true if the 
         operation was successful.
         """
         self.cursor.execute("DELETE FROM bans WHERE username = ? OR ip = ?;",
-                            (username,ip))
+                            (username, ip))
         self.connection.commit()
 
     def make_op(self, username):
@@ -118,28 +131,20 @@ class Database(object):
                             "username = ?;", (username,))
         self.connection.commit()
 
-
     def delete_post(self, post_id):
-        """Deletes the given post id."""
+        """Deletes the post located at the given ID."""
         self.cursor.execute("DELETE FROM posts WHERE post_id = ?;", (post_id,))
         self.connection.commit()
 
-    def get_post_count(self, board=None, last_login=0):
+    def get_post_count(self, last_login=0):
         """Returns the number of posts currently in the BBS's database if a 
         board is unspecified, otherwise returns the number of posts in that 
         board.
         """
-        if board:
-            self.cursor.execute("SELECT COUNT(post_id) FROM posts WHERE board "
-                                "= ? AND time > ?;", (board, last_login))
-        else:
-            self.cursor.execute("SELECT COUNT(post_id) FROM posts WHERE time "
-                                "> ?;", (last_login,))
-        try:
-            count = self.cursor.fetchone()[0]
-        except TypeError:
-            count = 0
-        return count
+        self.cursor.execute("SELECT COUNT(post_id) FROM posts WHERE time > ?;",
+                            (last_login,))
+        result = self.cursor.fetchone()
+        return result[0] if result else 0
 
     def get_posts(self, board, thread=None):
         """Returns a list of  all of the posts for a given board."""

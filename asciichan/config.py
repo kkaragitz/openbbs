@@ -17,10 +17,19 @@ def curry_configuration(path):
         """Gets a value from the current configuration file if it 
         exists, otherwise returns the given default value.
         """
-        if section in config and option in config[section]:
-            result = config.get(section, option)
-        else:
-            result = default
+        # Configparser is disgustingly different across Python implementations.
+        try:
+            if section in config and option in config[section]:
+                result = config.get(section, option)
+            else:
+                result = default
+        except TypeError:
+            # There's literally no way to wrap this nicely.
+            if section in config.sections() and option in \
+               config.options(section):
+                result = config.get(section, option)
+            else:
+                result = default
         return result
 
     return config_get

@@ -26,7 +26,7 @@ def spawn_server(config_get, debug=False):
 
     try:
         server.bind((host, port))
-    except OSError:
+    except (OSError, socket.gaierror):
         logging.critical("Could not bind to %s:%s!", host, port)
         server.close()
         sys.exit(1)
@@ -39,11 +39,13 @@ def spawn_server(config_get, debug=False):
             client, address = server.accept()
             ip = address[0]
             logging.info("Connection received from %s.", ip)
-            threading.Thread(
+            # Python2 does not support daemon in Thread's __init__.
+            connection_thread = threading.Thread(
                 target=handle,
-                daemon=True,
                 args=(client, ip, config_get)
-            ).start()
+            )
+            connection_thread.daemon = True
+            connection_thread.run()
             if debug:
                 server.close()
                 break

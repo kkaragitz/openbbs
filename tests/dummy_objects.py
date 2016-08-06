@@ -39,6 +39,3 @@ class DummyDatabase(object):
 
     def get_pm_count(self, *args):
         return 1
-
-
-dummy_config = lambda section option fallback: return fallback

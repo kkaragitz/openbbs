@@ -1,6 +1,7 @@
 """Client handling module. Sets up an environment for the current thread."""
 
 import logging
+import socket
 import sys
 import textwrap
 
@@ -17,7 +18,8 @@ def curry_io(client, database, ip):
         try:
             message = "\r\n".join(textwrap.wrap(string, width=80))
             client.send((string + end).encode())
-        except OSError:
+        except (OSError, socket.error):
+            # "socket.error" Seriously, guys? Real descriptive...
             logging.warning("Could not send \"%s\" to client." % string)
 
     def receive():

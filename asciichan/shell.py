@@ -202,10 +202,8 @@ def shell(send, receive, name, status, database, config_get):
             else:
                 send("REASON: ", end="")
                 reason = receive()
-            if database.ban_user(reason, username=target):
-                send("User %s successfully banned." % target)
-            else:
-                send("User %s does not exist." % target)
+            database.ban_user(reason, username=target)
+            send("User %s successfully banned." % target)
         elif command[0] == "banip" and status == "sysop": ##
             if len(command) > 1:
                 target = command[1]
