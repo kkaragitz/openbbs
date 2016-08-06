@@ -6,5 +6,5 @@ Designed to be accessible to anyone with a Telnet client or Netcat.
 
 __author__ = "Jakob Tsar-Fox <jakob@memeware.net>"
 __licence__ = "AGPLv3"
-__version__ = "0.2.0.dev1"
+__version__ = "0.2.0"
 

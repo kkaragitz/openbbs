@@ -1,37 +1,30 @@
-## Tests have been temporarily commented-out to prevent hanging.
+import logging
+import socket
+import threading
+import time
+import unittest
 
-# try:
-#     import configparser
-# except ImportError:
-#     import ConfigParser as configparser
-# import logging
-# import os
-# import socket
-# import threading
-# import unittest
+from tests.dummy_objects import DummyConfig
 
-# from asciichan.core import (main, spawn_server)
-# from asciichan.config import curry_configuration
+from asciichan.core import spawn_server
 
-# logging.disable(logging.CRITICAL)
+logging.disable(logging.CRITICAL)
 
 
-# class ServerSpawnTest(unittest.TestCase):
-#     def setUp(self):
-#         self.config = configparser.ConfigParser()
+class ServerSpawnTest(unittest.TestCase):
+    def test_create_server(self):
+        fakeconfig = DummyConfig()
+        threading.Thread(target=spawn_server, args=(fakeconfig.fakeget,
+                                                    True)).start()
+        # Connection occurs before binding if the test doesn't sleep. 
+        time.sleep(1)
+        test_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        test_sock.connect((socket.gethostbyname(socket.gethostname()), 1337))
+        self.assertTrue(test_sock.recv(1024))
+        test_sock.send(b"QUIT")
+        test_sock.close()
 
-#     def test_create_server(self):
-#         config_get = curry_configuration("none.conf")
-#         threading.Thread(target=spawn_server, args=(config_get, True)).start()
-#         test_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#         test_sock.connect((socket.gethostbyname(socket.gethostname()), 1337))
-#         self.assertTrue(test_sock.recv(1024))
-#         test_sock.close()
-
-#     def test_failure_to_bind(self):
-#         with open("temporary.ini", "w+") as temporary:
-#             temporary.write("[server]\nhost = 999.999.999.999")
-#         config_get = curry_configuration("temporary.ini")
-#         with self.assertRaises(SystemExit):
-#             spawn_server(config_get, True)
-#         os.remove("temporary.ini")
+    def test_failure_to_bind(self):
+        fakeconfig = DummyConfig(server={"host": "999.999.999"})
+        with self.assertRaises(SystemExit):
+            spawn_server(fakeconfig.fakeget, True)

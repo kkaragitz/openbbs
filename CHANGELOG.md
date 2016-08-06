@@ -8,6 +8,8 @@ This project uses the semantic versioning scheme.
 -----------------
 * Implemented a means of banning IP's from the interface.
 * Fixed config.ini parsing on Python2.
+* Implemented proper hash salting.
+* **_DROPPED OFFICIAL SUPPORT FOR PYTHON VERSIONS 2.6, 3.2 AND 3.3_**
 
 
 **Version 0.1.1**

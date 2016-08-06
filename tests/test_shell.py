@@ -1,8 +1,7 @@
 import unittest
 
-from tests.dummy_objects import (DummyClient, DummyDatabase)
+from tests.dummy_objects import (DummyClient, DummyConfig, DummyDatabase)
 
-from asciichan.config import curry_configuration
 from asciichan.shell import (box_boards, box_posts, box_thread, shell)
 
 
@@ -14,9 +13,9 @@ class FormattersTest(unittest.TestCase):
 
 
 class ShellTest(unittest.TestCase):
-    def test_quit(self):
+    def test_commands(self):
         client = DummyClient("quit")
         database = DummyDatabase()
-        config_get = curry_configuration("inexistent.conf")
+        fakeconfig = DummyConfig()
         self.assertFalse(shell(client.send, client.recv, "a", "user",
-                               database, config_get))
+                               database, fakeconfig.fakeget))

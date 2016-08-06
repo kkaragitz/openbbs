@@ -39,3 +39,17 @@ class DummyDatabase(object):
 
     def get_pm_count(self, *args):
         return 1
+
+
+class DummyConfig(object):
+    """[Document me!]"""
+    def __init__(self, **kwargs):
+        self.options = kwargs
+
+    def fakeget(self, section, option, default=None):
+        if option in self.options.get(section, {}):
+            result = self.options[section][option]
+        else:
+            result = default
+        return result
+        

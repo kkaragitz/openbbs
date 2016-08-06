@@ -39,7 +39,6 @@ def spawn_server(config_get, debug=False):
             client, address = server.accept()
             ip = address[0]
             logging.info("Connection received from %s.", ip)
-            # Python2 does not support daemon in Thread's __init__.
             connection_thread = threading.Thread(
                 target=handle,
                 args=(client, ip, config_get)
