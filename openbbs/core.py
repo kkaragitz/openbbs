@@ -1,4 +1,4 @@
-"""Primary entry point to the Asciichan server process."""
+"""Primary entry point to the OpenBBS server process."""
 
 import logging
 import os
@@ -8,21 +8,21 @@ import threading
 
 import daemon
 
-from asciichan.cli import parser
-from asciichan.config import curry_configuration
-from asciichan.session import handle
+from openbbs.cli import parser
+from openbbs.config import load_config
+from openbbs.session import handle
 
 
-def spawn_server(config_get, debug=False):
+def spawn_server(config, debug=False):
     """Creates the server instance from given parameters."""
-    host = config_get("server", "host", default=None)
-    port = int(config_get("server", "port", default=1337))
-    backlog = int(config_get("server", "backlog", default=5))
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # Allows for the server to easily be stopped and restarted.
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    backlog = int(config.get("backlog"))
+    port = int(config.get("port"))
+    host = config.get("host")
     if not host:
         host = socket.gethostbyname(socket.gethostname())
+
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     try:
         server.bind((host, port))
@@ -37,14 +37,14 @@ def spawn_server(config_get, debug=False):
         server.listen(backlog)
         while True:
             client, address = server.accept()
-            ip = address[0]
-            logging.info("Connection received from %s.", ip)
+            ip_address = address[0]
+            logging.info("Connection received from %s.", ip_address)
             connection_thread = threading.Thread(
                 target=handle,
-                args=(client, ip, config_get)
+                args=(client, ip_address, config)
             )
             connection_thread.daemon = True
-            connection_thread.run()
+            connection_thread.start()
             if debug:
                 server.close()
                 break
@@ -54,29 +54,25 @@ def spawn_server(config_get, debug=False):
 
 
 def main():
-    """Primary entry point for Asciichan. Parses the configuration file
+    """Primary entry point for OpenBBS. Parses the configuration file
     and command-line arguments to set up a server environment.
     """
     arguments = parser.parse_args()
-    config_get = curry_configuration(arguments.config)
+    config = load_config(arguments.config)
     logging.basicConfig(
         format="[%(asctime)s] %(levelname)s: %(message)s",
         datefmt="%H:%M:%S",
         level=logging.INFO,
-        filename=config_get("server", "logfile", default=None)
+        filename=config.get("logfile")
     )
 
     if arguments.daemonize:
         context = daemon.DaemonContext()
-        context.files_preseve = [
-            arguments.config,
-            config_get("server", "database", default="database.db")
-        ]
+        context.files_preseve = [arguments.config, config.get("database")]
         context.working_directory = os.getcwd()
         with context:
-            spawn_server(config_get)
-
+            spawn_server(config)
     else:
-        spawn_server(config_get)
+        spawn_server(config)
 
     logging.info("Server closed.")

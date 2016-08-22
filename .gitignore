@@ -8,5 +8,5 @@ dist/
 .tox/
 .coverage
 
-asciichan.log
+openbbs.log
 database.db

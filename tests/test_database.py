@@ -3,7 +3,7 @@ import os
 import time
 import unittest
 
-from asciichan.database import Database
+from openbbs.database import Database
 
 
 class DatabaseCreationTest(unittest.TestCase):

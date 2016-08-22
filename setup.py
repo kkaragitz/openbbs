@@ -4,7 +4,7 @@ try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
-from asciichan import __version__
+from openbbs import __version__
 
 
 def long_description():
@@ -13,23 +13,23 @@ def long_description():
 
 
 setup(
-    name="Asciichan",
+    name="OpenBBS",
     license="AGPLv3+",
     version=__version__,
     author="Jakob Tsar-Fox",
     author_email="jakob@memeware.net",
     maintainer="Jakob Tsar-Fox",
     maintainer_email="jakob@memeware.net",
-    url="http://tsar-fox.com/projects/asciichan",
+    url="http://tsar-fox.com/projects/openbbs",
     description="Simple BBS server written in Python",
     long_description=long_description(),
-    download_url="https://github.com/TsarFox/asciichan",
-    packages=["asciichan"],
+    download_url="https://github.com/TsarFox/openbbs",
+    packages=["openbbs"],
     include_package_data=True,
     install_requires=["python-daemon>=2.1.1"],
     extras_require={},
     tests_require=["tox"],
-    entry_points={"console_scripts": ["asciichan-server = asciichan.cli:main"]},
+    entry_points={"console_scripts": ["openbbs-server = openbbs.cli:main"]},
     keywords="bbs telnet server",
     classifiers=[
         "Development Status :: 1 - Planning",

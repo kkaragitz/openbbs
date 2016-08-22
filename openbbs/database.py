@@ -17,7 +17,7 @@ class Database(object):
     """Model and controller implementation for the BBS."""
     def __init__(self, database, operators):
         self.operators = operators.split(",")
-        self.connection  = sqlite3.connect(database)
+        self.connection = sqlite3.connect(database)
         self.cursor = self.connection.cursor()
 
         self.cursor.execute("CREATE TABLE IF NOT EXISTS posts (post_id "
@@ -62,7 +62,7 @@ class Database(object):
         return status
 
     def attempt_login(self, username, password):
-        """Return the user_status if the given username matches the given 
+        """Return the user_status if the given username matches the given
         password in the users table, otherwise returns None.
         """
         self.cursor.execute("SELECT salt FROM users WHERE username = ?;",
@@ -112,7 +112,7 @@ class Database(object):
         self.connection.commit()
 
     def unban_user(self, username=None, ip=None):
-        """Removes a username/ip from the bans table, returning true if the 
+        """Removes a username/ip from the bans table, returning true if the
         operation was successful.
         """
         self.cursor.execute("DELETE FROM bans WHERE username = ? OR ip = ?;",
@@ -137,8 +137,8 @@ class Database(object):
         self.connection.commit()
 
     def get_post_count(self, last_login=0):
-        """Returns the number of posts currently in the BBS's database if a 
-        board is unspecified, otherwise returns the number of posts in that 
+        """Returns the number of posts currently in the BBS's database if a
+        board is unspecified, otherwise returns the number of posts in that
         board.
         """
         self.cursor.execute("SELECT COUNT(post_id) FROM posts WHERE time > ?;",
@@ -166,7 +166,7 @@ class Database(object):
         self.connection.commit()
 
     def send_pm(self, sender, receiver, message):
-        """Generate a database entry for a private message with the given 
+        """Generate a database entry for a private message with the given
         sender, receiver and message if the receiver exists.
         """
         self.cursor.execute("SELECT user_id FROM users WHERE username = ?;",
