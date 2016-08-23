@@ -6,5 +6,4 @@ python:
   - "3.5-dev"
   - "pypy"
 install: "pip install python-daemon"
-script: "python -m unittest tests.test_command tests.test_config tests.test_core tests.test_database tests.test_login tests.test_session tests.test_shell"
-
+script: "python -m unittest tests.test_command tests.test_config tests.test_core tests.test_database tests.test_formatters tests.test_login tests.test_session tests.test_shell"

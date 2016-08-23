@@ -46,6 +46,7 @@ def spawn_server(config, debug=False):
             connection_thread.daemon = True
             connection_thread.start()
             if debug:
+                connection_thread.join()
                 server.close()
                 break
     except KeyboardInterrupt:

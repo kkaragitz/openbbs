@@ -9,7 +9,7 @@ This project uses the semantic versioning scheme.
 * Changed name of project to "OpenBBS."
 * Fixed textwrapping bug.
 * Fixed issue with thread creation and hangup.
-* Improved upon command parsing.
+* Added command shortcuts for the login and shell sessions.
 
 
 **Version 0.2.0**

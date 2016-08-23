@@ -21,9 +21,3 @@ class ClientHandler(unittest.TestCase):
         client = DummyClient(b"quit")
         with self.assertRaises(SystemExit):
             handle(client, "", config)
-
-    def test_banned_user(self):
-        config = load_config("./inexistent.ini")
-        client = DummyClient(b"login", b"a", b"a", b"quit")
-        with self.assertRaises(SystemExit):
-            handle(client, "", config)

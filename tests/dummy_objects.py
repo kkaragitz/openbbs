@@ -6,6 +6,10 @@ class DummyUser(object):
         self.counter = -1
         self.messages = args
         self.database = DummyDatabase()
+        self.name = "DummyUser"
+        self.status = "sysop"
+        self.current_board = "main"
+        self.current_thread = None
 
     def send(self, *args, **kwargs):
         pass
@@ -56,6 +60,41 @@ class DummyDatabase(object):
     def get_pm_count(self, *args):
         return 1
 
-    def check_banned(self, name, ip_address):
-        if name == "a":
-            return "Banned"
+    def get_posts(self, board, thread=None):
+        if thread == "2":
+            posts = None
+        else:
+            posts = ((1, 1, "a", "a", "a"),)
+        return posts
+
+    def make_post(self, *args, **kwargs):
+        pass
+
+    def send_pm(self, sender, receiver, message):
+        if receiver == "meme2":
+            sent = False
+        else:
+            sent = True
+        return sent
+
+    def delete_post(self, target):
+        pass
+
+    def ban_user(self, reason, username=None):
+        pass
+
+    def unban_user(self, username):
+        pass
+
+    def get_pms(self, name):
+        if name == "DummyUserEmpty":
+            messages = ()
+        else:
+            messages = (("a", "a", 1, False),)
+        return messages
+
+    def make_op(self, target):
+        pass
+
+    def remove_op(self, target):
+        pass
