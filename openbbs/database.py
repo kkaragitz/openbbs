@@ -153,7 +153,8 @@ class Database(object):
                                 "FROM posts WHERE post_id = ? OR reply = ? "
                                 "ORDER BY post_id ASC;", (thread, thread))
             posts = self.cursor.fetchall()
-            if len(posts) == 0 or posts[0][0] != thread:
+            # Int casts may be unnecessary.
+            if len(posts) == 0 or int(posts[0][0]) != int(thread):
                 posts = None
         else:
             self.cursor.execute("SELECT post_id, time, name, subject, body "
