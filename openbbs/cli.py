@@ -2,7 +2,7 @@
 
 import argparse
 
-from asciichan import (__doc__, __version__)
+from openbbs import (__doc__, __version__)
 
 
 class CustomHelp(argparse.HelpFormatter):
@@ -29,7 +29,6 @@ parser = argparse.ArgumentParser(
     description=__doc__
 )
 
-
 docs = parser.add_argument_group("Documentation")
 docs.add_argument(
     "-h",
@@ -41,10 +40,9 @@ docs.add_argument(
     "-v",
     "--version",
     action="version",
-    version="Asciichan Server, Version %s." % __version__,
+    version="OpenBBS, Version %s." % __version__,
     help="Display the currently installed version and exit."
 )
-
 
 server_opts = parser.add_argument_group("Server Options")
 server_opts.add_argument(
@@ -58,6 +56,6 @@ server_opts.add_argument(
     "--config",
     metavar="XX",
     default="./config.ini",
-    help="Specify the path of the config.ini file that the Asciichan\nserver "
+    help="Specify the path of the config.ini file that the OpenBBS\nserver "
     "should read from."
 )

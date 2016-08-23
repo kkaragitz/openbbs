@@ -1,7 +1,15 @@
 Change Log
 ==========
-This document records all notable changes to the Asciichan codebase.
+This document records all notable changes to the OpenBBS codebase.
 This project uses the semantic versioning scheme.
+
+
+**Version 0.3.0**
+-----------------
+* Changed name of project to "OpenBBS."
+* Fixed textwrapping bug.
+* Fixed issue with thread creation and hangup.
+* Added command shortcuts for the login and shell sessions.
 
 
 **Version 0.2.0**

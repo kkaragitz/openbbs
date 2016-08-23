@@ -1,9 +1,8 @@
-import sqlite3
 import os
 import time
 import unittest
 
-from asciichan.database import Database
+from openbbs.database import Database
 
 
 class DatabaseCreationTest(unittest.TestCase):
@@ -16,7 +15,7 @@ class DatabaseCreationTest(unittest.TestCase):
         os.remove("./database.db")
         if os.path.exists("./database.old.db"):
             os.rename("./database.old.db", "./database.db")
-            
+
     def test_database_creation(self):
         self.assertTrue(os.path.exists("./database.db"))
 
@@ -49,7 +48,7 @@ class DatabaseAccountTest(unittest.TestCase):
     def tearDown(self):
         if os.path.exists("./database.old.db"):
             os.rename("./database.old.db", "./database.db")
-        
+
     def test_create_user(self):
         self.database.create_user("jakob", b"memes")
         self.database.cursor.execute("SELECT * FROM users WHERE "

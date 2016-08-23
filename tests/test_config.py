@@ -1,15 +1,17 @@
 import os
 import unittest
 
-from asciichan.config import curry_configuration
+from openbbs.config import load_config
 
 
-class ConfigurationCurryTest(unittest.TestCase):
-    def test_config_get(self):
+class ConfigurationCreationTest(unittest.TestCase):
+    def test_config_defaults(self):
+        config = load_config("inexistent.conf")
+        self.assertTrue(config.get("name", False))
+
+    def test_file_override(self):
         with open("temporary.ini", "w+") as temporary:
             temporary.write("[server]\nhost = 192.168.1.12")
-        config_get = curry_configuration("temporary.ini")
-        self.assertEqual(config_get("server", "host"), "192.168.1.12")
-        self.assertEqual(config_get("a", "b", default="c"), "c")
-        self.assertEqual(config_get("a", "b"), None)
+        config = load_config("temporary.ini")
+        self.assertEqual(config.get("host"), "192.168.1.12")
         os.remove("temporary.ini")
