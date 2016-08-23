@@ -150,11 +150,12 @@ class Database(object):
         """Returns a list of  all of the posts for a given board."""
         if thread:
             self.cursor.execute("SELECT post_id, time, name, subject, body "
-                                "FROM posts WHERE post_id = ? OR reply = ? "
-                                "ORDER BY post_id ASC;", (thread, thread))
+                                "FROM posts WHERE post_id = ? AND reply is "
+                                "NULL OR reply = ? ORDER BY post_id ASC;",
+                                (thread, thread))
             posts = self.cursor.fetchall()
             # Int casts may be unnecessary.
-            if len(posts) == 0 or int(posts[0][0]) != int(thread):
+            if len(posts) == 0 or posts[0][0] != int(thread):
                 posts = None
         else:
             self.cursor.execute("SELECT post_id, time, name, subject, body "
