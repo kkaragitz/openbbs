@@ -18,8 +18,8 @@ def send_help_text(user, _):
     user.send("==================\r\nAVAILABLE COMMANDS\r\n=================="
               "\r\n[R]ULES\t\tPrint the rules of the BBS.\r\n"
               "[B]OARD\t\tChange to a specified board.\r\n"
-              "[T]HREAD\t\tOpen a given thread number.\r\n"
-              "[RE]FRESH\t\tRefresh the current listing.\r\n"
+              "[T]HREAD\tOpen a given thread number.\r\n"
+              "[RE]FRESH\tRefresh the current listing.\r\n"
               "[P]OST\t\tMake a post or reply.\r\n"
               "[IN]FO\t\tPrint information about this BBS software.\r\n"
               "[Q]UIT\t\tExit the BBS.")
@@ -27,7 +27,7 @@ def send_help_text(user, _):
         user.send("[I]NBOX\t\tGet private messages.\r\n"
                   "[S]END\t\tSend a private message.")
     if user.status == "sysop":
-        user.send("[D]ELETE\t\tDelete a post\r\n"
+        user.send("[D]ELETE\tDelete a post\r\n"
                   "[BA]N\t\tBan a username.\r\n"
                   "[U]NBAN\t\tUnban a username.\r\n"
                   "[O]P\t\tGive a user operator privileges.\r\n"

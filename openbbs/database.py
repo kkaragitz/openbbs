@@ -152,11 +152,15 @@ class Database(object):
             self.cursor.execute("SELECT post_id, time, name, subject, body "
                                 "FROM posts WHERE post_id = ? OR reply = ? "
                                 "ORDER BY post_id ASC;", (thread, thread))
+            posts = self.cursor.fetchall()
+            if len(posts) == 0 or posts[0][0] != thread:
+                posts = None
         else:
             self.cursor.execute("SELECT post_id, time, name, subject, body "
                                 "FROM posts WHERE board = ? AND reply IS NULL "
                                 "ORDER BY post_id DESC;", (board,))
-        return self.cursor.fetchall()
+            posts = self.cursor.fetchall()
+        return posts
 
     def make_post(self, name, subject, body, board, reply=None):
         """Creates a database entry for the given post information."""
