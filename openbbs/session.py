@@ -61,7 +61,7 @@ def handle(client, ip_address, config):
 
     banned = database.check_banned(user.name, ip_address)
     if banned:
-        user.send("%s Reason: %s" % (config.get("banned"), ip_address, banned))
+        user.send("%s Reason: %s" % (config.get("banned"), banned))
         logging.info("%s attempted to login, but is banned.", user.name)
     else:
         logging.info("%s logged in as %s.", ip_address, user.name)

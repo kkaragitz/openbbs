@@ -165,12 +165,21 @@ def delete_post(user, parameters):
     """Deletes a post if the user has that capability."""
     if user.status == "sysop":
         if len(parameters) > 1:
-            target = int(parameters[1])
+            try:
+                target = int(parameters[1])
+            except ValueError:
+                user.send("Invalid post number.")
+                target = None
         else:
             user.send("POST ID: ", end="")
-            target = int(user.receive())
-        user.database.delete_post(target)
-        user.send("Post %d successfully deleted." % target)
+            try:
+                target = int(user.receive())
+            except ValueError:
+                user.send("Invalid post number.")
+                target = None
+        if target is not None:
+            user.database.delete_post(target)
+            user.send("Post %d successfully deleted." % target)
     else:
         user.send("You can't do that!")
 
