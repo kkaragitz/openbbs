@@ -29,7 +29,6 @@ parser = argparse.ArgumentParser(
     description=__doc__
 )
 
-
 docs = parser.add_argument_group("Documentation")
 docs.add_argument(
     "-h",
@@ -41,10 +40,9 @@ docs.add_argument(
     "-v",
     "--version",
     action="version",
-    version="OpenBBS Server, Version %s." % __version__,
+    version="OpenBBS, Version %s." % __version__,
     help="Display the currently installed version and exit."
 )
-
 
 server_opts = parser.add_argument_group("Server Options")
 server_opts.add_argument(

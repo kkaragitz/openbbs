@@ -6,7 +6,7 @@ This project uses the semantic versioning scheme.
 
 **Version 0.3.0**
 -----------------
-* Changed name of software to "OpenBBS."
+* Changed name of project to "OpenBBS."
 * Fixed textwrapping bug.
 * Fixed issue with thread creation and hangup.
 * Improved upon command parsing.

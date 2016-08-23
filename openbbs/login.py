@@ -3,6 +3,9 @@
 import time
 
 
+# Theoretically, the return could be removed and tests would only need to be
+# tweaked a small bit to check for user.name and user.status rather than
+# prompt's return value.
 def prompt(user):
     """Provides the connected client with a login prompt, from which they can
     log into an existing account, create a new one, or choose to browse
@@ -39,7 +42,7 @@ def prompt(user):
             password = user.receive().encode()
             user.send("CONFIRM PASSWORD: ", end="")
             if user.receive().encode() != password:
-                send("Passwords do not match.")
+                user.send("Passwords do not match.")
                 continue
             status = user.database.create_user(name, password)
             if status:
@@ -53,7 +56,7 @@ def prompt(user):
             user.send("Don't make trouble...")
             break
         elif command == "quit" or command == "q":
-            # name = status = None
+            name = status = None
             user.close()
             break
         else:

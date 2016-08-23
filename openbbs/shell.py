@@ -5,7 +5,7 @@ import textwrap
 import time
 
 from openbbs import __version__
-from openbbs.command import CommandInterpereter
+from openbbs.command import CommandInterpreter
 
 
 def box_boards(boards):
@@ -285,82 +285,21 @@ def shell(user, config):
     boards = config.get("boards").split(",")
 
     command = ["DEFAULT", "NULL"]
-    command_interpereter = CommandInterpereter(
-        handle_bogus_input,
-        (),
-        (user,)
-    )
-    command_interpereter.add_command(
-        ("help", "h"),
-        send_help_text,
-        ()
-    )
-    command_interpereter.add_command(
-        ("rules", "r"),
-        send_rules,
-        (config,)
-    )
-    command_interpereter.add_command(
-        ("info", "in"),
-        send_server_info,
-        ()
-    )
-    command_interpereter.add_command(
-        ("board", "b"),
-        change_board,
-        (boards,)
-    )
-    command_interpereter.add_command(
-        ("thread", "t"),
-        change_thread,
-        ()
-    )
-    command_interpereter.add_command(
-        ("inbox", "i"),
-        get_inbox,
-        ()
-    )
-    command_interpereter.add_command(
-        ("refresh", "re"),
-        refresh_all,
-        (boards,)
-    )
-    command_interpereter.add_command(
-        ("post", "p"),
-        make_post,
-        ()
-    )
-    command_interpereter.add_command(
-        ("send", "s"),
-        send_message,
-        ()
-    )
-    command_interpereter.add_command(
-        ("delete", "d"),
-        delete_post,
-        ()
-    )
-    command_interpereter.add_command(
-        ("ban", "ba"),
-        ban_user,
-        ()
-    )
-    command_interpereter.add_command(
-        ("unban", "u"),
-        unban_user,
-        ()
-    )
-    command_interpereter.add_command(
-        ("op", "o"),
-        op_user,
-        ()
-    )
-    command_interpereter.add_command(
-        ("deop", "de"),
-        deop_user,
-        ()
-    )
-
+    command_interpreter = CommandInterpreter(handle_bogus_input, (), (user,))
+    command_interpreter.add(("help", "h"), send_help_text, ())
+    command_interpreter.add(("rules", "r"), send_rules, (config,))
+    command_interpreter.add(("info", "in"), send_server_info, ())
+    command_interpreter.add(("board", "b"), change_board, (boards,))
+    command_interpreter.add(("thread", "t"), change_thread, ())
+    command_interpreter.add(("inbox", "i"), get_inbox, ())
+    command_interpreter.add(("refresh", "re"), refresh_all, (boards,))
+    command_interpreter.add(("post", "p"), make_post, ())
+    command_interpreter.add(("send", "s"), send_message, ())
+    command_interpreter.add(("delete", "d"), delete_post, ())
+    command_interpreter.add(("ban", "ba"), ban_user, ())
+    command_interpreter.add(("unban", "u"), unban_user, ())
+    command_interpreter.add(("op", "o"), op_user, ())
+    command_interpreter.add(("deop", "de"), deop_user, ())
 
     user.send(box_boards(boards))
     user.send("Enter \"[H]ELP\" to see available commands.")
@@ -374,7 +313,6 @@ def shell(user, config):
         if command[0] == "quit" or command[0] == "q":
             break
         else:
-            command_interpereter.call_command(command)
-    
+            command_interpreter.call(command)
 
     user.send(config.get("quit"))

@@ -1,11 +1,28 @@
 """Shared dummy objects for unittests."""
 
 
-class DummyClient(object):
-    """Dummy client to test sessions."""
+class DummyUser(object):
     def __init__(self, *args):
         self.counter = -1
         self.messages = args
+        self.database = DummyDatabase()
+
+    def send(self, *args, **kwargs):
+        pass
+
+    def receive(self, *args):
+        self.counter += 1
+        return self.messages[self.counter]
+
+    def close(self):
+        pass
+
+
+class DummyClient(object):
+    def __init__(self, *args):
+        self.counter = -1
+        self.messages = args
+        self.database = DummyDatabase()
 
     def send(self, *args, **kwargs):
         pass
@@ -19,7 +36,6 @@ class DummyClient(object):
 
 
 class DummyDatabase(object):
-    """Dummy client to test sessions."""
     def close(self):
         pass
 
@@ -34,22 +50,12 @@ class DummyDatabase(object):
             status = None
         return (status, 1)
 
-    def get_post_count(self, **kwargs):
+    def get_post_count(self, time=None):
         return 1
 
     def get_pm_count(self, *args):
         return 1
 
-
-class DummyConfig(object):
-    """[Document me!]"""
-    def __init__(self, **kwargs):
-        self.options = kwargs
-
-    def fakeget(self, section, option, default=None):
-        if option in self.options.get(section, {}):
-            result = self.options[section][option]
-        else:
-            result = default
-        return result
-        
+    def check_banned(self, name, ip_address):
+        if name == "a":
+            return "Banned"

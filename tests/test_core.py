@@ -14,11 +14,15 @@ class ServerSpawnTest(unittest.TestCase):
     def test_create_server(self):
         config = load_config("inexistent.conf")
         threading.Thread(target=spawn_server, args=(config, True)).start()
-        # Connection occurs before binding if the test doesn't sleep. 
-        time.sleep(1)
+
+        # Connection occurs before binding if the test doesn't sleep.
+        # 3 seconds is a good middle-ground.
+        time.sleep(3)
         test_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         test_sock.connect((socket.gethostbyname(socket.gethostname()), 1337))
+
         self.assertTrue(test_sock.recv(1024))
+
         test_sock.send(b"QUIT")
         test_sock.close()
 

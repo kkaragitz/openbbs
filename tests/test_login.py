@@ -1,47 +1,33 @@
-# import unittest
+import unittest
 
-# from tests.dummy_objects import (DummyClient, DummyDatabase)
+from openbbs.login import prompt
+from tests.dummy_objects import DummyUser
 
-# from openbbs.login import prompt
 
+class LoginPromptTest(unittest.TestCase):
+    def test_login_user(self):
+        dummy_user = DummyUser("login", "a", "a")
+        self.assertEqual(prompt(dummy_user), ("a", "user"))
 
-# class LoginPromptTest(unittest.TestCase):
-#     def test_login_user(self):
-#         client = DummyClient("login", "a", "a")
-#         database = DummyDatabase()
-#         self.assertEqual(prompt(client.send, client.recv, client, database),
-#                          ("a", "user"))
+    def test_failed_login(self):
+        dummy_user = DummyUser("login", "a", "b", "quit")
+        self.assertEqual(prompt(dummy_user), (None, None))
 
-#     def test_failed_login(self):
-#         client = DummyClient("login", "a", "b", "quit")
-#         database = DummyDatabase()
-#         self.assertEqual(prompt(client.send, client.recv, client, database),
-#                          (None, None))
+    def test_register_user(self):
+        dummy_user = DummyUser("register", "a", "a", "a")
+        self.assertEqual(prompt(dummy_user), ("a", "user"))
 
-#     def test_register_user(self):
-#         client = DummyClient("register", "a", "a", "a")
-#         database = DummyDatabase()
-#         self.assertEqual(prompt(client.send, client.recv, client, database),
-#                          ("a", "user"))
+    def test_failed_registration(self):
+        dummy_user = DummyUser("register", "b", "a", "a", "quit")
+        self.assertEqual(prompt(dummy_user), (None, None))
+        dummy_user.counter = -1
+        dummy_user.messages = ("register", "a", "a", "b", "quit")
+        self.assertEqual(prompt(dummy_user), (None, None))
 
-#     def test_failed_registration(self):
-#         client = DummyClient("register", "b", "a", "a", "quit")
-#         database = DummyDatabase()
-#         self.assertEqual(prompt(client.send, client.recv, client, database),
-#                          (None, None))
-#         client.counter = -1
-#         client.messages = ["register", "a", "a", "b", "quit"]
-#         self.assertEqual(prompt(client.send, client.recv, client, database),
-#                          (None, None))
-    
-#     def test_anonymous_login(self):
-#         client = DummyClient("anonymous")
-#         database = DummyDatabase()
-#         self.assertEqual(prompt(client.send, client.recv, client, database),
-#                          ("Anonymous", "coward"))
+    def test_anonymous_login(self):
+        dummy_user = DummyUser("anonymous")
+        self.assertEqual(prompt(dummy_user), ("Anonymous", "coward"))
 
-#     def test_quit_prompt(self):
-#         client = DummyClient("invalid_command", "quit")
-#         database = DummyDatabase()
-#         self.assertEqual(prompt(client.send, client.recv, client, database),
-#                          (None, None))
+    def test_invalid_command(self):
+        dummy_user = DummyUser("invalid_command", "quit")
+        self.assertEqual(prompt(dummy_user), (None, None))

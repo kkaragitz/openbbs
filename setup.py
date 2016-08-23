@@ -32,7 +32,7 @@ setup(
     entry_points={"console_scripts": ["openbbs-server = openbbs.cli:main"]},
     keywords="bbs telnet server",
     classifiers=[
-        "Development Status :: 1 - Planning",
+        "Development Status :: 4 - Beta",
         "Environment :: No Input/Output (Daemon)",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",

@@ -76,7 +76,7 @@ class Database(object):
                                 "WHERE username = ? AND password = ?;",
                                 (username, binascii.hexlify(dk)))
             result = self.cursor.fetchone()
-            # FIXME: Redundant. <jakob@memeware.net>
+            # FIXME: This is pretty redundant. <jakob@memeware.net>
             if result:
                 status, last_login = result
             else:
