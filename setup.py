@@ -29,7 +29,7 @@ setup(
     install_requires=["python-daemon>=2.1.1"],
     extras_require={},
     tests_require=["tox"],
-    entry_points={"console_scripts": ["openbbs-server = openbbs.cli:main"]},
+    entry_points={"console_scripts": ["openbbs-server = openbbs.core:main"]},
     keywords="bbs telnet server",
     classifiers=[
         "Development Status :: 4 - Beta",

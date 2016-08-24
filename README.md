@@ -3,6 +3,8 @@
 ## Server software programmed and maintained by [Jakob.](http://tsar-fox.com/)
 OpenBBS is a simple text-based BBS server written in Python. Its goal is to be easily accessible to anyone with Netcat or a Telnet client, and functional on both major versions of Python.
 
+A working deployment of this server is currently running at tsar-fox.com:1337.
+
 OpenBBS is free software, licensed under the GNU Affero General Public License.
 
 [![Build Status](https://travis-ci.org/TsarFox/openbbs.svg?branch=master)](https://travis-ci.org/TsarFox/openbbs)  [![PyPI Downloads](https://img.shields.io/pypi/dm/OpenBBS.svg)](https://pypi.python.org/pypi/OpenBBS/)  [![License](https://img.shields.io/github/license/tsarfox/openbbs.svg)](https://www.gnu.org/licenses/agpl-3.0.html)

@@ -8,5 +8,6 @@ dist/
 .tox/
 .coverage
 
+OpenBBS_Screenshot.png
 openbbs.log
 database.db
