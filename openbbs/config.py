@@ -17,15 +17,19 @@ DEFAULTS = {
     "database": "./database.db",
     "logfile": None,
     "boards": "Random:Posts without a home.,Technology:Install Gentoo.",
-    "operators": ""
+    "operators": "",
+    "hash_iterations": 500000,
+    "salt_length": 64
 }
 
 
 def load_config(path):
-    """Version-agnostic wrapper around the configparser module. Returns a
-    "squashed" dictionary containing all options.
+    """Wrapper for the standard configparser module. Returns a
+    dictionary containing all options, rather than the individual
+    sections.
     """
     config = DEFAULTS
+
     config_file = configparser.ConfigParser()
     config_file.read(path)
 

@@ -1,4 +1,7 @@
-"""Primary entry point to the OpenBBS server process."""
+"""Entry point to the OpenBBS server process. Creates an environment
+from the given configuration file and command-line arguments, and
+initializes the server.
+"""
 
 import logging
 import os
@@ -14,7 +17,9 @@ from openbbs.session import handle
 
 
 def spawn_server(config, debug=False):
-    """Creates the server instance from given parameters."""
+    """Initializes the server according to the given configuration, and
+    spawns threads to handle incoming connections.
+    """
     backlog = int(config.get("backlog"))
     port = int(config.get("port"))
     host = config.get("host")

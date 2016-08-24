@@ -1,4 +1,6 @@
-"""Client handling module. Sets up an environment for the current thread."""
+"""Client handling module. Responsible for handling logins and shell
+sessions for inbound connections.
+"""
 
 import logging
 import socket
@@ -52,14 +54,13 @@ def handle(client, ip_address, config):
     """Primary BBS functionality. Creates an environment for the current
     connection thread, then passes the client off to a shell instance.
     """
-    database = Database(config.get("database"), config.get("operators"))
-    user = UserSession(client, database, ip_address)
+    user = UserSession(client, Database(config), ip_address)
 
     user.send(config.get("motd"))
-    user.send("There are %d posts right now." % database.get_post_count())
+    user.send("There are currently %d posts." % user.database.get_post_count())
     user.name, user.status = prompt(user)
 
-    banned = database.check_banned(user.name, ip_address)
+    banned = user.database.check_banned(user.name, ip_address)
     if banned:
         user.send("%s Reason: %s" % (config.get("banned"), banned))
         logging.info("%s attempted to login, but is banned.", user.name)

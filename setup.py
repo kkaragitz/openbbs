@@ -21,7 +21,7 @@ setup(
     maintainer="Jakob Tsar-Fox",
     maintainer_email="jakob@memeware.net",
     url="http://tsar-fox.com/projects/openbbs",
-    description="Simple BBS server written in Python",
+    description="Simple and easily accessible BBS server written in Python.",
     long_description=long_description(),
     download_url="https://github.com/TsarFox/openbbs",
     packages=["openbbs"],

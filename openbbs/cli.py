@@ -49,13 +49,12 @@ server_opts.add_argument(
     "-b",
     "--daemonize",
     action="store_true",
-    help="Run the server as a UNIX daemon. (Background Process)\n\n"
+    help="Run the server as a UNIX daemon.\n\n"
 )
 server_opts.add_argument(
     "-c",
     "--config",
     metavar="XX",
     default="./config.ini",
-    help="Specify the path of the config.ini file that the OpenBBS\nserver "
-    "should read from."
+    help="Specify an alternate path for the config.ini file.\n\n"
 )

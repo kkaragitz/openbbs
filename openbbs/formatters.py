@@ -1,51 +1,72 @@
-"""General text formatters for the shell."""
+"""General text formatters to be used as shell output."""
 
+import re
 import textwrap
 import time
 
+DISALLOWED_CHARACTERS = (7, 8, 12, 26, 127)
+
+
+def scrub_input(text):
+    """Removes control-character injection from the given text."""
+    text = text.replace("\033c", "(Injection Attempt)")
+    for character in DISALLOWED_CHARACTERS:
+        text = text.replace(chr(character), "(Injection Attempt)")
+    return text
+
 
 def box_boards(boards):
-    """Text formatter for the board listing."""
-    string = "+=============================================================="\
-             "================+\r\n|                                BOARD LIS"\
-             "TING                                 |\r\n+===================="\
-             "==========================================================+\r\n"
-    for title, description in [board.split(":") for board in boards]:
-        string += "| %-18s | %55s |\r\n+====================================="\
-                  "=========================================+\r\n" % \
+    """Formats the given boards into a nice-looking listing."""
+    string = "+=============================================================" \
+             "=================+\r\n|                                BOARD L" \
+             "ISTING                                 |\r\n+=================" \
+             "=============================================================+" \
+             "\r\n"
+
+    for title, description in (board.split(":") for board in boards):
+        string += "| %-18s | %55s |\r\n+====================================" \
+                  "==========================================+\r\n" % \
                   (title, description)
+
     return string
 
 
 def box_posts(posts):
-    """Text formatter for a listing of threads in a board."""
-    string = "+=============================================================="\
-             "================+\r\n|                                THREAD LI"\
-             "STING                                |\r\n+===================="\
-             "==========================================================+\r\n"
+    """Formats a list of threads into a nice-looking listing."""
+    string = "+=============================================================" \
+             "=================+\r\n|                                THREAD " \
+             "LISTING                                |\r\n+=================" \
+             "=============================================================+" \
+             "\r\n"
+
     for post_id, pub_time, poster, subject, body in posts:
         printable_time = time.strftime("%m/%d/%y %H:%M:%S",
                                        time.localtime(pub_time))
-        string += "| #%-6d|%.17s| %-19s| %-29.29s|\r\n+======================"\
-        "========================================================+" % \
-        (post_id, printable_time, poster, subject.strip())
+        string += "| #%-6d| %.17s | %-19s| %-27.27s|\r\n+===================" \
+                  "=========================================================" \
+                  "==+" % (post_id, printable_time, poster, subject.strip())
+
     return string
 
 
 def box_thread(posts):
-    """Returns a table-formatted version of the thread being viewed."""
-    title = posts[0][3]
-    string = "+=============================================================="\
-             "================+\r\n|" + ((78 - len(title)) // 2) * " " + title\
-             + ((78 - len(title)) // 2) * " " + "|\r\n+======================"\
-             "========================================================+\r\n"
-    for post in posts:
-        post_time = time.ctime(post[1])
+    """Formats a list of posts into a nice-looking listing."""
+    title = posts[0][3] + " " if len(posts[0][3]) % 2 != 0 else posts[0][3]
+    string = "+=============================================================" \
+             "=================+\r\n|" + ((78 - len(title)) // 2) * " " \
+             + title + ((78 - len(title)) // 2) * " " + "|\r\n+=============" \
+             "==============================================================" \
+             "===+\r\n"
+
+    for post_id, post_time, name, _, body in posts:
+        body = scrub_input(body)
         string += "| #%-9d | %-26s posted on %-26s |\r\n+===================="\
                   "=========================================================="\
-                  "+\r\n" % (post[0], post[2], post_time)
-        for line in textwrap.wrap(post[4], width=76):
+                  "+\r\n" % (post_id, name, time.ctime(post_time))
+
+        for line in textwrap.wrap(body, width=76):
             string += "| %-76s |\r\n" % line
-        string += "+========================================================="\
-                  "=====================+\r\n"
+        string += "\033[m+==================================================" \
+                  "============================+\r\n"
+
     return string

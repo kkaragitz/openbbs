@@ -2,14 +2,16 @@ import os
 import time
 import unittest
 
+from openbbs.config import load_config
 from openbbs.database import Database
 
 
 class DatabaseCreationTest(unittest.TestCase):
     def setUp(self):
+        config = load_config("inexistent.ini")
         if os.path.exists("./database.db"):
             os.rename("./database.db", "./database.old.db")
-        self.database = Database("./database.db", "")
+        self.database = Database(config)
 
     def tearDown(self):
         os.remove("./database.db")
@@ -41,9 +43,10 @@ class DatabaseCreationTest(unittest.TestCase):
 
 class DatabaseAccountTest(unittest.TestCase):
     def setUp(self):
+        config = load_config("inexistent.ini")
         if os.path.exists("./database.db"):
             os.rename("./database.db", "./database.old.db")
-        self.database = Database("./database.db", "")
+        self.database = Database(config)
 
     def tearDown(self):
         if os.path.exists("./database.old.db"):
@@ -66,12 +69,12 @@ class DatabaseAccountTest(unittest.TestCase):
 
     def test_login_new_op(self):
         self.database.create_user("jakob", b"memes")
-        self.database.operators = ["jakob"]
+        self.database.config["operators"] = "jakob"
         self.database.attempt_login("jakob", b"memes")
         self.database.cursor.execute("SELECT user_status FROM users WHERE "
                                      "username = 'jakob';")
         self.assertEqual(self.database.cursor.fetchone(), ("sysop",))
-
+        self.database.config["operators"] = ""
 
     def test_banned_user(self):
         self.database.create_user("jakob", b"memes")
@@ -97,9 +100,10 @@ class DatabaseAccountTest(unittest.TestCase):
 
 class DatabasePostTest(unittest.TestCase):
     def setUp(self):
+        config = load_config("inexistent.ini")
         if os.path.exists("./database.db"):
             os.rename("./database.db", "./database.old.db")
-        self.database = Database("./database.db", "")
+        self.database = Database(config)
         self.database.make_post("jakob", "Hello!", "Test!", "technology")
 
     def tearDown(self):
@@ -129,9 +133,10 @@ class DatabasePostTest(unittest.TestCase):
 
 class DatabasePMTest(unittest.TestCase):
     def setUp(self):
+        config = load_config("inexistent.ini")
         if os.path.exists("./database.db"):
             os.rename("./database.db", "./database.old.db")
-        self.database = Database("./database.db", "")
+        self.database = Database(config)
         self.database.create_user("jakob", b"password")
 
     def tearDown(self):
