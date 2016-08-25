@@ -5,7 +5,6 @@ sessions for inbound connections.
 import logging
 import socket
 import sys
-import textwrap
 
 from openbbs.database import Database
 from openbbs.login import prompt
@@ -21,6 +20,9 @@ class UserSession(object):
         self.client = client
         self.database = database
         self.ip_address = ip_address
+
+        self.name = ""
+        self.status = ""
 
         self.current_board = "main"
         self.current_thread = None

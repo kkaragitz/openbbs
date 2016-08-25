@@ -8,42 +8,48 @@ from openbbs.shell import (ban_user, change_board, change_thread, delete_post,
 from tests.dummy_objects import DummyUser
 
 
-class IndividualCommandsTest(unittest.TestCase):
+class AuxiliaryCommandsTest(unittest.TestCase):
     def setUp(self):
         self.dummy_user = DummyUser()
 
     def test_handle_bogus_input(self):
-        self.assertFalse(handle_bogus_input(self.dummy_user, ("bogus",)))
+        handle_bogus_input(self.dummy_user, ("bogus",))
+        self.assertEqual(self.dummy_user.last_message,
+                         "Unknown command: \"bogus\"\r\n")
 
     def test_send_help_text(self):
-        self.assertFalse(send_help_text(self.dummy_user, None))
+        send_help_text(self.dummy_user, None)
+        self.assertEqual(self.dummy_user.last_message[:24],
+                         "[D]ELETE\tDelete a post\r\n")
 
     def test_send_rules(self):
         config = load_config("./inexistent.ini")
-        self.assertFalse(send_rules(self.dummy_user, None, config))
+        send_rules(self.dummy_user, None, config)
+        self.assertEqual(self.dummy_user.last_message, "\r\n")
 
     def test_send_info(self):
-        self.assertFalse(send_server_info(self.dummy_user, None))
+        send_server_info(self.dummy_user, None)
+        self.assertEqual(self.dummy_user.last_message[:22],
+                         "OpenBBS Server Version")
+
+
+class NavigationCommandsTest(unittest.TestCase):
+    def setUp(self):
+        self.dummy_user = DummyUser()
 
     def test_change_board_with_params(self):
         change_board(self.dummy_user, (None, "random"), ("random:a",))
         self.assertEqual(self.dummy_user.current_board, "random")
-        self.dummy_user.current_board = "main"
 
     def test_change_board_with_commands(self):
         self.dummy_user.messages = ("random",)
         change_board(self.dummy_user, (None,), ("random:a",))
         self.assertEqual(self.dummy_user.current_board, "random")
-        self.dummy_user.counter = -1
-        self.dummy_user.messages = []
-        self.dummy_user.current_board = "main"
 
     def test_change_board_return_to_main(self):
         self.dummy_user.messages = ("",)
         change_board(self.dummy_user, (None,), ("random:a",))
         self.assertEqual(self.dummy_user.current_board, "main")
-        self.dummy_user.counter = -1
-        self.dummy_user.messages = []
 
     def test_change_board_invalid_board(self):
         change_board(self.dummy_user, (None, "random"), ("",))
@@ -53,28 +59,18 @@ class IndividualCommandsTest(unittest.TestCase):
         self.dummy_user.current_board = "random"
         change_thread(self.dummy_user, (None, "1"))
         self.assertEqual(self.dummy_user.current_thread, "1")
-        self.dummy_user.current_board = "main"
-        self.dummy_user.current_thread = None
 
     def test_change_thread_with_commands(self):
         self.dummy_user.current_board = "random"
         self.dummy_user.messages = ("1",)
         change_thread(self.dummy_user, (None,))
         self.assertEqual(self.dummy_user.current_thread, "1")
-        self.dummy_user.counter = -1
-        self.dummy_user.messages = []
-        self.dummy_user.current_board = "main"
-        self.dummy_user.current_thread = None
 
     def test_change_thread_return_board_home(self):
         self.dummy_user.current_board = "random"
         self.dummy_user.messages = ("",)
         change_thread(self.dummy_user, (None,))
         self.assertEqual(self.dummy_user.current_thread, None)
-        self.dummy_user.counter = -1
-        self.dummy_user.messages = []
-        self.dummy_user.current_board = "main"
-        self.dummy_user.current_thread = None
 
     def test_change_thread_fail_on_main(self):
         self.dummy_user.current_board = "main"
@@ -86,140 +82,174 @@ class IndividualCommandsTest(unittest.TestCase):
         change_thread(self.dummy_user, (None, "2"))
         self.assertEqual(self.dummy_user.current_thread, None)
 
+    def test_refresh_all(self):
+        refresh_all(self.dummy_user, None, ["random:a"])
+        self.assertTrue(self.dummy_user.last_message)
+        self.dummy_user.current_board = "random"
+        refresh_all(self.dummy_user, None, ["random:a"])
+        self.assertTrue(self.dummy_user.last_message)
+        self.dummy_user.current_thread = "1"
+        refresh_all(self.dummy_user, None, ["random:a"])
+        self.assertTrue(self.dummy_user.last_message)
+
+
+class PrivateMessagingCommandsTest(unittest.TestCase):
+    def setUp(self):
+        self.dummy_user = DummyUser()
+
     def test_get_inbox(self):
-        self.assertFalse(get_inbox(self.dummy_user, None))
+        get_inbox(self.dummy_user, None)
+        self.assertEqual(self.dummy_user.last_message[35:],
+                         "Message from a: \"a\"\r\n")
 
     def test_get_empty_inbox(self):
         self.dummy_user.name = "DummyUserEmpty"
-        self.assertFalse(get_inbox(self.dummy_user, None))
-        self.dummy_user.name = "DummyUser"
+        get_inbox(self.dummy_user, None)
+        self.assertEqual(self.dummy_user.last_message,
+                         "Your inbox is empty.\r\n")
 
     def test_get_inbox_fail_on_coward(self):
         self.dummy_user.status = "coward"
-        self.assertFalse(get_inbox(self.dummy_user, None))
-        self.dummy_user.status = "sysop"
+        get_inbox(self.dummy_user, None)
+        self.assertEqual(self.dummy_user.last_message,
+                         "You can't do that!\r\n")
+
+    def test_send_message_with_params(self):
+        send_message(self.dummy_user, (None, "meme", "a"))
+        self.assertEqual(self.dummy_user.last_message,
+                         "Message successfully sent.\r\n")
+
+    def test_send_message_with_commands(self):
+        self.dummy_user.messages = ("meme2", "a")
+        send_message(self.dummy_user, ())
+        self.assertEqual(self.dummy_user.last_message,
+                         "User meme2 does not exist.\r\n")
+
+    def test_send_message_fail_on_coward(self):
+        self.dummy_user.status = "coward"
+        send_message(self.dummy_user, None)
+        self.assertEqual(self.dummy_user.last_message,
+                         "You can't do that!\r\n")
+
+
+class PostingCommandsTest(unittest.TestCase):
+    def setUp(self):
+        self.dummy_user = DummyUser()
 
     def test_make_post_with_commands(self):
         self.dummy_user.current_board = "random"
         self.dummy_user.current_thread = None
         self.dummy_user.messages = ("a", "a")
-        self.assertFalse(make_post(self.dummy_user, None))
+        make_post(self.dummy_user, None)
+        self.assertEqual(self.dummy_user.last_message,
+                         "Successfully posted.\r\n")
+        self.dummy_user.messages = ("a",)
         self.dummy_user.counter = -1
-        self.dummy_user.messages = []
         self.dummy_user.current_thread = "1"
-        self.dummy_user.messages = ("a")
-        self.assertFalse(make_post(self.dummy_user, None))
-        self.dummy_user.counter = -1
-        self.dummy_user.messages = []
+        make_post(self.dummy_user, None)
+        self.assertEqual(self.dummy_user.last_message,
+                         "Successfully posted.\r\n")
 
     def test_make_post_fail_on_main(self):
-        self.dummy_user.current_board = "main"
-        self.assertFalse(make_post(self.dummy_user, None))
+        make_post(self.dummy_user, None)
+        self.assertEqual(self.dummy_user.last_message,
+                         "You can't post on the overboard.\r\n")
 
-    def test_refresh_all(self):
-        self.dummy_user.current_thread = "1"
-        self.assertFalse(refresh_all(self.dummy_user, None, ["random:a"]))
-        self.dummy_user.current_thread = None
-        self.dummy_user.current_board = "main"
-        self.assertFalse(refresh_all(self.dummy_user, None, ["random:a"]))
-        self.dummy_user.current_board = "random"
-        self.assertFalse(refresh_all(self.dummy_user, None, ["random:a"]))
 
-    def test_send_message_with_params(self):
-        self.dummy_user.status = "sysop"
-        self.assertFalse(send_message(self.dummy_user, (None, "meme", "a")))
-
-    def test_send_message_with_commands(self):
-        self.dummy_user.status = "sysop"
-        self.dummy_user.messages = ("meme2", "a")
-        self.assertFalse(send_message(self.dummy_user, ()))
-        self.dummy_user.counter = -1
-        self.dummy_user.messages = []
-
-    def test_send_message_fail_on_coward(self):
-        self.dummy_user.status = "coward"
-        self.assertFalse(send_message(self.dummy_user, None))
-        self.dummy_user.status = "sysop"
+class AdministrationCommandsTest(unittest.TestCase):
+    def setUp(self):
+        self.dummy_user = DummyUser()
 
     def test_delete_post_with_params(self):
-        self.dummy_user.status = "sysop"
-        self.assertFalse(delete_post(self.dummy_user, (None, "1")))
+        delete_post(self.dummy_user, (None, "1"))
+        self.assertEqual(self.dummy_user.last_message,
+                         "Post 1 successfully deleted.\r\n")
 
     def test_delete_post_with_commands(self):
-        self.dummy_user.status = "sysop"
         self.dummy_user.messages = ("1")
-        self.assertFalse(delete_post(self.dummy_user, ()))
-        self.dummy_user.counter = -1
-        self.dummy_user.messages = []
+        delete_post(self.dummy_user, ())
+        self.assertEqual(self.dummy_user.last_message,
+                         "Post 1 successfully deleted.\r\n")
 
     def test_delete_post_fail_on_not_sysop(self):
         self.dummy_user.status = "user"
-        self.assertFalse(delete_post(self.dummy_user, None))
-        self.dummy_user.status = "sysop"
+        delete_post(self.dummy_user, None)
+        self.assertEqual(self.dummy_user.last_message,
+                         "You can't do that!\r\n")
 
     def test_ban_user_with_params(self):
-        self.dummy_user.status = "sysop"
-        self.assertFalse(ban_user(self.dummy_user, (None, "meme", "no")))
+        ban_user(self.dummy_user, (None, "meme", "no"))
+        self.assertEqual(self.dummy_user.last_message,
+                         "User meme successfully banned.\r\n")
 
     def test_ban_user_with_commands(self):
-        self.dummy_user.status = "sysop"
         self.dummy_user.messages = ("meme", "no")
-        self.assertFalse(ban_user(self.dummy_user, ()))
-        self.dummy_user.counter = -1
-        self.dummy_user.messages = []
+        ban_user(self.dummy_user, ())
+        self.assertEqual(self.dummy_user.last_message,
+                         "User meme successfully banned.\r\n")
 
     def test_ban_user_fail_on_not_sysop(self):
-        self.dummy_user.status = "anonymous"
-        self.assertFalse(ban_user(self.dummy_user, (None, "meme", "no")))
+        self.dummy_user.status = "coward"
+        ban_user(self.dummy_user, (None, "meme", "no"))
+        self.assertEqual(self.dummy_user.last_message,
+                         "You can't do that!\r\n")
 
     def test_unban_user_with_params(self):
-        self.dummy_user.status = "sysop"
-        self.assertFalse(unban_user(self.dummy_user, (None, "meme")))
+        unban_user(self.dummy_user, (None, "meme"))
+        self.assertEqual(self.dummy_user.last_message,
+                         "User meme successfully unbanned.\r\n")
 
     def test_unban_user_with_commands(self):
-        self.dummy_user.status = "sysop"
-        self.dummy_user.messages = ("meme")
-        self.assertFalse(unban_user(self.dummy_user, ()))
-        self.dummy_user.counter = -1
-        self.dummy_user.messages = []
+        self.dummy_user.messages = ("meme",)
+        unban_user(self.dummy_user, ())
+        self.assertEqual(self.dummy_user.last_message,
+                         "User meme successfully unbanned.\r\n")
 
     def test_unban_user_fail_on_not_sysop(self):
-        self.dummy_user.status = "anonymous"
-        self.assertFalse(unban_user(self.dummy_user, (None, "meme")))
+        self.dummy_user.status = "coward"
+        unban_user(self.dummy_user, (None, "meme"))
+        self.assertEqual(self.dummy_user.last_message,
+                         "You can't do that!\r\n")
 
     def test_op_user_with_params(self):
-        self.dummy_user.status = "sysop"
-        self.assertFalse(op_user(self.dummy_user, (None, "meme")))
+        op_user(self.dummy_user, (None, "meme"))
+        self.assertEqual(self.dummy_user.last_message,
+                         "User meme successfully sysop'd.\r\n")
 
     def test_op_user_with_commands(self):
-        self.dummy_user.status = "sysop"
-        self.dummy_user.messages = ("meme")
-        self.assertFalse(op_user(self.dummy_user, ()))
-        self.dummy_user.counter = -1
-        self.dummy_user.messages = []
+        self.dummy_user.messages = ("meme",)
+        op_user(self.dummy_user, ())
+        self.assertEqual(self.dummy_user.last_message,
+                         "User meme successfully sysop'd.\r\n")
 
     def test_op_user_fail_on_not_sysop(self):
-        self.dummy_user.status = "anonymous"
-        self.assertFalse(op_user(self.dummy_user, (None, "meme")))
+        self.dummy_user.status = "coward"
+        op_user(self.dummy_user, (None, "meme"))
+        self.assertEqual(self.dummy_user.last_message,
+                         "You can't do that!\r\n")
 
     def test_deop_user_with_params(self):
-        self.dummy_user.status = "sysop"
-        self.assertFalse(deop_user(self.dummy_user, (None, "meme")))
+        deop_user(self.dummy_user, (None, "meme"))
+        self.assertEqual(self.dummy_user.last_message,
+                         "User meme successfully deop'd.\r\n")
 
     def test_deop_user_with_commands(self):
-        self.dummy_user.status = "sysop"
-        self.dummy_user.messages = ("meme")
-        self.assertFalse(deop_user(self.dummy_user, ()))
-        self.dummy_user.counter = -1
-        self.dummy_user.messages = []
+        self.dummy_user.messages = ("meme",)
+        deop_user(self.dummy_user, ())
+        self.assertEqual(self.dummy_user.last_message,
+                         "User meme successfully deop'd.\r\n")
 
     def test_deop_user_fail_on_not_sysop(self):
-        self.dummy_user.status = "anonymous"
-        self.assertFalse(deop_user(self.dummy_user, (None, "meme")))
+        self.dummy_user.status = "coward"
+        deop_user(self.dummy_user, (None, "meme"))
+        self.assertEqual(self.dummy_user.last_message,
+                         "You can't do that!\r\n")
 
 
-class ShellTest(unittest.TestCase):
+class CommandInterpreterTest(unittest.TestCase):
     def test_accept_commands(self):
         config = load_config("./inexistent.ini")
         dummy_user = DummyUser("help", "bogus", "quit")
-        self.assertFalse(shell(dummy_user, config))
+        shell(dummy_user, config)
+        self.assertEqual(dummy_user.last_message,
+                         config["quit"] + "\r\n")

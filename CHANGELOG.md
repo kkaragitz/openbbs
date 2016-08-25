@@ -8,6 +8,7 @@ This project uses the semantic versioning scheme.
 -----------------
 * Implemented countermeasures for control character injection.
 * Fixed thread post formatting.
+* Implemented a means of changing the number of hash iterations used and salt length via the configuration file.
 
 
 **Version 0.3.0**

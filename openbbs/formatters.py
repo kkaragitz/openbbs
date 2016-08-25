@@ -1,6 +1,5 @@
 """General text formatters to be used as shell output."""
 
-import re
 import textwrap
 import time
 
@@ -39,12 +38,12 @@ def box_posts(posts):
              "=============================================================+" \
              "\r\n"
 
-    for post_id, pub_time, poster, subject, body in posts:
-        printable_time = time.strftime("%m/%d/%y %H:%M:%S",
-                                       time.localtime(pub_time))
+    for post_id, pub_time, poster, subject, _ in posts:
+        time_text = time.strftime("%m/%d/%y %H:%M:%S",
+                                  time.localtime(pub_time))
         string += "| #%-6d| %.17s | %-19s| %-27.27s|\r\n+===================" \
                   "=========================================================" \
-                  "==+" % (post_id, printable_time, poster, subject.strip())
+                  "==+\r\n" % (post_id, time_text, poster, subject.strip())
 
     return string
 

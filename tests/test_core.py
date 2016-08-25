@@ -12,6 +12,7 @@ logging.disable(logging.CRITICAL)
 
 class ServerSpawnTest(unittest.TestCase):
     # Literally no idea why this test doesn't work.
+
     # def test_create_server(self):
     #     config = load_config("inexistent.conf")
     #     threading.Thread(target=spawn_server, args=(config, True)).start()

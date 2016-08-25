@@ -10,9 +10,10 @@ class DummyUser(object):
         self.status = "sysop"
         self.current_board = "main"
         self.current_thread = None
+        self.last_message = ""
 
-    def send(self, *args, **kwargs):
-        pass
+    def send(self, message, end="\r\n"):
+        self.last_message = message + end
 
     def receive(self, *args):
         self.counter += 1
