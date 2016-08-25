@@ -81,12 +81,14 @@ def box_inbox(messages):
              "=============================================================+" \
              "\r\n"
 
-    for sender, message, timesent, read in messages:
+    for message_id, sender, message, timesent, read in messages:
+        text_time = time.strftime("%m/%d/%y", time.localtime(timesent))
         message = message[:21] + "..." if len(message) >= 24 else message
         message_status = "R" if read else "N"
-        string += "| %1s | From %-10s on %19s | \"%-24s\" |\r\n+============" \
+
+        string += "| %1s | #%-4s |From %-10s on %-11s | \"%-30s\" |\r\n+====" \
                   "=========================================================" \
-                  "=========+\r\n" % (message_status, sender,
-                                      time.ctime(timesent), message)
+                  "=================+\r\n" % (message_status, message_id,
+                                              sender, text_time, message)
 
     return string

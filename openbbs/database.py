@@ -48,10 +48,11 @@ class Database(object):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS bans (ban_no "
                             "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                             "username TEXT, ip TEXT, reason TEXT NOT NULL);")
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS pms (sender TEXT NOT "
-                            "NULL, receiver TEXT NOT NULL, message TEXT NOT "
-                            "NULL, time INTEGER NOT NULL, read INTEGER NOT "
-                            "NULL);")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS pms (message_id "
+                            "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                            "sender TEXT NOT NULL, receiver TEXT NOT NULL, "
+                            "message TEXT NOT NULL, time INTEGER NOT NULL, "
+                            "read INTEGER NOT NULL);")
 
         if config.get("max_message_age"):
             age_max = time.time() - float(config.get("max_message_age"))
@@ -216,8 +217,8 @@ class Database(object):
 
     def get_pms(self, receiver):
         """Get all of the PM's sent to the given receiver."""
-        self.cursor.execute("SELECT sender, message, time, read FROM pms "
-                            "WHERE receiver = ? ORDER BY time DESC;",
+        self.cursor.execute("SELECT message_id, sender, message, time, read "
+                            "FROM pms WHERE receiver = ? ORDER BY time DESC;",
                             (receiver,))
         messages = self.cursor.fetchall()
         self.cursor.execute("UPDATE pms SET read = 1 WHERE receiver = ?;",
