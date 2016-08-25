@@ -3,12 +3,11 @@
 import textwrap
 import time
 
-DISALLOWED_CHARACTERS = (7, 8, 12, 26, 127)
+DISALLOWED_CHARACTERS = (7, 8, 12, 26, 27, 127)
 
 
 def scrub_input(text):
     """Removes control-character injection from the given text."""
-    text = text.replace("\033c", "(Injection Attempt)")
     for character in DISALLOWED_CHARACTERS:
         text = text.replace(chr(character), "(Injection Attempt)")
     return text
@@ -50,12 +49,15 @@ def box_posts(posts):
 
 def box_thread(posts):
     """Formats a list of posts into a nice-looking listing."""
-    title = posts[0][3] + " " if len(posts[0][3]) % 2 != 0 else posts[0][3]
+    title = scrub_input(posts[0][3])
+    if len(title) % 2 == 1:
+        title += " "
+
     string = "+=============================================================" \
              "=================+\r\n|" + ((78 - len(title)) // 2) * " " \
-             + title + ((78 - len(title)) // 2) * " " + "|\r\n+=============" \
+             + "%.78s" % title + ((78 - len(title)) // 2) * " " + "|\r\n+===" \
              "==============================================================" \
-             "===+\r\n"
+             "=============+\r\n"
 
     for post_id, post_time, name, _, body in posts:
         body = scrub_input(body)
@@ -65,7 +67,7 @@ def box_thread(posts):
 
         for line in textwrap.wrap(body, width=76):
             string += "| %-76s |\r\n" % line
-        string += "\033[m+==================================================" \
-                  "============================+\r\n"
+        string += "+========================================================" \
+                  "======================+\r\n"
 
     return string

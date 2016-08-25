@@ -16,9 +16,9 @@ class FormattersTest(unittest.TestCase):
 
 class InputScrubbingTest(unittest.TestCase):
     def test_remove_single_characters(self):
-        text = chr(7) + chr(8) + chr(12) + chr(26) + chr(127)
-        self.assertEqual(scrub_input(text), "(Injection Attempt)" * 5)
+        text = chr(7) + chr(8) + chr(12) + chr(26) + chr(27) +chr(127)
+        self.assertEqual(scrub_input(text), "(Injection Attempt)" * 6)
 
     def test_remove_form_feed(self):
         text = "\033c"
-        self.assertEqual(scrub_input(text), "(Injection Attempt)")
+        self.assertEqual(scrub_input(text), "(Injection Attempt)c")

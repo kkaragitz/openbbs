@@ -4,6 +4,11 @@ This document records all notable changes to the OpenBBS codebase.
 This project uses the semantic versioning scheme.
 
 
+**Version 0.5.0**
+-----------------
+* Added Ascii character 27 to the filter list.
+
+
 **Version 0.4.0**
 -----------------
 * Implemented countermeasures for control character injection.
