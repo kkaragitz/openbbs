@@ -67,18 +67,15 @@ class DatabaseAccountTest(unittest.TestCase):
         self.assertEqual(self.database.attempt_login("kakob", b"nenes"),
                          (None, None))
 
+    # This test does not work for Pypi at ALL.
     def test_login_new_op(self):
         self.database.create_user("jakob", b"memes")
         self.database.config["operators"] = "jakob"
         status, _ = self.database.attempt_login("jakob", b"memes")
         self.assertEqual(status, "sysop")
-
-        # This test did not work on Pypi and requires further investigation.
-        # It has been temporarily altered.
-        
-        # self.database.cursor.execute("SELECT user_status FROM users WHERE "
-        #                              "username = 'jakob';")
-        # self.assertEqual(self.database.cursor.fetchone(), ("sysop",))
+        self.database.cursor.execute("SELECT user_status FROM users WHERE "
+                                     "username = 'jakob';")
+        self.assertEqual(self.database.cursor.fetchone(), ("sysop",))
 
     def test_banned_user(self):
         self.database.create_user("jakob", b"memes")
