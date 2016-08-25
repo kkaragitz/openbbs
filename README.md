@@ -75,6 +75,9 @@ The "config.ini" file allows for aspects of the server to be changed.
 * hash_iterations - The number of iterations to be used in PBKDF2 password hashing. More will bring better security, but having it at too high of a value will make login and registration take a very long time. This should be changed ahead of time, as changing it for an existing database will make it impossible for users to log in.
 * salt_length - The length (in bytes) of the cryptographic salt to be generated for each user. More is better, but going overkill here isn't going to be particularly helpful. Unlike hash_iterations, this can be changed for an existing database, but users who registered before the change will still have a salt length of the previous value.
 
+*[client]*
+* max_message_age - The period of time (in seconds) the BBS should wait before deleting read messages. Setting this to 0 will disable the automatic message deletion feature altogether.
+
 
 TODO
 ----

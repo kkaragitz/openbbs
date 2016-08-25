@@ -53,6 +53,13 @@ class Database(object):
                             "NULL, time INTEGER NOT NULL, read INTEGER NOT "
                             "NULL);")
 
+        if config.get("max_message_age"):
+            age_max = time.time() - float(config.get("max_message_age"))
+            self.cursor.execute("DELETE FROM pms WHERE time <= ? AND read;",
+                                (age_max,))
+
+        self.connection.commit()
+
     def create_user(self, name, password):
         """Creates a database entry in the users table for the given
         user information, provided that it does not already exist.

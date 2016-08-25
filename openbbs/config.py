@@ -19,7 +19,8 @@ DEFAULTS = {
     "boards": "Random:Posts without a home.,Technology:Install Gentoo.",
     "operators": "",
     "hash_iterations": 500000,
-    "salt_length": 64
+    "salt_length": 64,
+    "max_message_age": 604800
 }
 
 

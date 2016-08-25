@@ -5,7 +5,7 @@ import time
 
 from openbbs import __version__
 from openbbs.command import CommandInterpreter
-from openbbs.formatters import (box_boards, box_posts, box_thread)
+from openbbs.formatters import (box_boards, box_inbox, box_posts, box_thread)
 
 
 def handle_bogus_input(user, parameters):
@@ -96,14 +96,19 @@ def get_inbox(user, _):
     """Sends the user their inbox, provided they are not anonymous."""
     if user.status != "coward":
         messages = user.database.get_pms(user.name)
-        for sender, message, timesent, read in messages:
-            read_text = "(*NEW*) " if not read else ""
-            user.send("%s[%s] Message from %s: \"%s\"" %
-                      (read_text, time.ctime(timesent), sender, message))
         if len(messages) == 0:
             user.send("Your inbox is empty.")
+        else:
+            user.send(box_inbox(messages))
     else:
         user.send("You can't do that!")
+
+
+# def get_more(user, _):
+#     if user.status != "coward":
+#         messages = user.database.get_pms(user.name)
+#     else:
+#         user.send("You can't do that!")
 
 
 def make_post(user, _):

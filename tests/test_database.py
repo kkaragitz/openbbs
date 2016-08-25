@@ -135,10 +135,10 @@ class DatabasePostTest(unittest.TestCase):
 
 class DatabasePMTest(unittest.TestCase):
     def setUp(self):
-        config = load_config("inexistent.ini")
+        self.config = load_config("inexistent.ini")
         if os.path.exists("./database.db"):
             os.rename("./database.db", "./database.old.db")
-        self.database = Database(config)
+        self.database = Database(self.config)
         self.database.create_user("jakob", b"password")
 
     def tearDown(self):
@@ -149,3 +149,12 @@ class DatabasePMTest(unittest.TestCase):
         self.database.send_pm("sender", "jakob", "Hello!")
         self.assertEqual(self.database.get_pm_count("jakob"), 1)
         self.assertTrue(self.database.get_pms("jakob"))
+
+    def test_delete_aged_pm(self):
+        self.config["max_message_age"] = 1
+        self.database.send_pm("sender", "jakob", "Hello!")
+        self.database.get_pms("jakob")
+        self.database.close()
+        time.sleep(1)
+        self.database = Database(self.config)
+        self.assertFalse(self.database.get_pms("jakob"))

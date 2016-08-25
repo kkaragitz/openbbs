@@ -71,3 +71,22 @@ def box_thread(posts):
                   "======================+\r\n"
 
     return string
+
+
+def box_inbox(messages):
+    """[Document me!]"""
+    string = "+=============================================================" \
+             "=================+\r\n|                                    INB" \
+             "OX                                     |\r\n+=================" \
+             "=============================================================+" \
+             "\r\n"
+
+    for sender, message, timesent, read in messages:
+        message = message[:21] + "..." if len(message) >= 24 else message
+        message_status = "R" if read else "N"
+        string += "| %1s | From %-10s on %19s | \"%-24s\" |\r\n+============" \
+                  "=========================================================" \
+                  "=========+\r\n" % (message_status, sender,
+                                      time.ctime(timesent), message)
+
+    return string
