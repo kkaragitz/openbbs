@@ -71,6 +71,10 @@ The "config.ini" file allows for aspects of the server to be changed.
 * boards - Boards on this BBS, separated by comma. A description of the board is specified by adding a colon (:) and the description after the board name.
 * operators - List of usernames to be given operator automatically, separated by comma. Changes will take effect when they register or login.
 
+*[server]*
+* hash_iterations - The number of iterations to be used in PBKDF2 password hashing. More will bring better security, but having it at too high of a value will make login and registration take a very long time. This should be changed ahead of time, as changing it for an existing database will make it impossible for users to log in.
+* salt_length - The length (in bytes) of the cryptographic salt to be generated for each user. More is better, but going overkill here isn't going to be particularly helpful. Unlike hash_iterations, this can be changed for an existing database, but users who registered before the change will still have a salt length of the previous value.
+
 
 TODO
 ----
