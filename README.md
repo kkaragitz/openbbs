@@ -66,7 +66,7 @@ The "config.ini" file allows for aspects of the server to be changed.
 * host - The IP that OpenBBS will bind to.
 * port - The port that the BBS server should bind to.
 * backlog - How many connections OpenBBS should accept at any one time.
-* database - The database file that OpenBBS should read and write from.
+* database - The database file that OpenBBS should read and write from. If desired, this can be set to :memory: to indicate that the database should not be written to disk, but instead kept in random access memory.
 * logfile - Specify a logfile to write to. If left blank, log messages will be written to stdout.
 * boards - Boards on this BBS, separated by comma. A description of the board is specified by adding a colon (:) and the description after the board name.
 * operators - List of usernames to be given operator automatically, separated by comma. Changes will take effect when they register or login.
