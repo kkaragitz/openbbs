@@ -9,6 +9,9 @@ This project uses the semantic versioning scheme.
 * Added Ascii character 27 to the filter list.
 * Implemented a formatter for the private messaging system inbox.
 * Read messages will now be automatically deleted when they reach a certain pre-configured age.
+* Control character filtering is now much more subtle, and doesn't say when it happens.
+* Filtering is now used everywhere a user can provide text input.
+* Added a "more" option to read more of a private message, with an accompanying formatter.
 
 
 **Version 0.4.0**

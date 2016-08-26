@@ -5,7 +5,8 @@ import time
 
 from openbbs import __version__
 from openbbs.command import CommandInterpreter
-from openbbs.formatters import (box_boards, box_inbox, box_posts, box_thread)
+from openbbs.formatters import (box_boards, box_inbox, box_message,
+                                box_posts, box_thread)
 
 
 def handle_bogus_input(user, parameters):
@@ -25,6 +26,7 @@ def send_help_text(user, _):
               "[Q]UIT\t\tExit the BBS.")
     if user.status != "coward":
         user.send("[I]NBOX\t\tGet private messages.\r\n"
+                  "[M]ORE\t\tRead the full message.\r\n"
                   "[S]END\t\tSend a private message.")
     if user.status == "sysop":
         user.send("[D]ELETE\tDelete a post\r\n"
@@ -104,11 +106,20 @@ def get_inbox(user, _):
         user.send("You can't do that!")
 
 
-# def get_more(user, _):
-#     if user.status != "coward":
-#         messages = user.database.get_pms(user.name)
-#     else:
-#         user.send("You can't do that!")
+def get_more(user, parameters):
+    if user.status != "coward":
+        if len(parameters) > 1:
+            message_id = parameters[1]
+        else:
+            user.send("MESSAGE ID: ", end="")
+            message_id = user.receive()
+        message = user.database.get_specific_pm(user.name, message_id)
+        if message:
+            user.send(box_message(message))
+        else:
+            user.send("Message does not exist, or does not belong to you.")
+    else:
+        user.send("You can't do that!")
 
 
 def make_post(user, _):
@@ -262,6 +273,7 @@ def shell(user, config):
     command_interpreter.add(("board", "b"), change_board, (boards,))
     command_interpreter.add(("thread", "t"), change_thread, ())
     command_interpreter.add(("inbox", "i"), get_inbox, ())
+    command_interpreter.add(("more", "m"), get_more, ())
     command_interpreter.add(("refresh", "re"), refresh_all, (boards,))
     command_interpreter.add(("post", "p"), make_post, ())
     command_interpreter.add(("send", "s"), send_message, ())

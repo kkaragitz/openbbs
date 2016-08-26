@@ -226,6 +226,18 @@ class Database(object):
         self.connection.commit()
         return messages
 
+    def get_specific_pm(self, receiver, message_id):
+        """Get the private message with the given ID, ensuring that the
+        user has permission to read it.
+        """
+        self.cursor.execute("SELECT sender, message FROM pms WHERE receiver "
+                            "= ? AND message_id = ?;", (receiver, message_id))
+        message = self.cursor.fetchone()
+        self.cursor.execute("UPDATE pms SET read = 1 WHERE receiver = ? AND "
+                            "message_id = ?;", (receiver, message_id))
+        self.connection.commit()
+        return message
+
     def close(self):
         """Closes the current database."""
         self.connection.close()

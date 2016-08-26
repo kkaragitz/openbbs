@@ -2,9 +2,10 @@ import unittest
 
 from openbbs.config import load_config
 from openbbs.shell import (ban_user, change_board, change_thread, delete_post,
-                           deop_user, get_inbox, handle_bogus_input, make_post,
-                           op_user, refresh_all, send_help_text, send_message,
-                           send_rules, send_server_info, shell, unban_user)
+                           deop_user, get_inbox, get_more, handle_bogus_input,
+                           make_post, op_user, refresh_all, send_help_text,
+                           send_message, send_rules, send_server_info, shell,
+                           unban_user)
 from tests.dummy_objects import DummyUser
 
 
@@ -99,8 +100,8 @@ class PrivateMessagingCommandsTest(unittest.TestCase):
 
     def test_get_inbox(self):
         get_inbox(self.dummy_user, None)
-        self.assertEqual(self.dummy_user.last_message[35:],
-                         "Message from a: \"a\"\r\n")
+        self.assertEqual(self.dummy_user.last_message[119:124],
+                         "INBOX")
 
     def test_get_empty_inbox(self):
         self.dummy_user.name = "DummyUserEmpty"
@@ -111,6 +112,30 @@ class PrivateMessagingCommandsTest(unittest.TestCase):
     def test_get_inbox_fail_on_coward(self):
         self.dummy_user.status = "coward"
         get_inbox(self.dummy_user, None)
+        self.assertEqual(self.dummy_user.last_message,
+                         "You can't do that!\r\n")
+
+    def test_get_specific_message_with_params(self):
+        get_more(self.dummy_user, (None, "1"))
+        self.assertEqual(self.dummy_user.last_message[115:129],
+                         "Message from a")
+
+    def test_get_specific_message_with_commands(self):
+        self.dummy_user.messages = ("1",)
+        get_more(self.dummy_user, ())
+        self.assertEqual(self.dummy_user.last_message[115:129],
+                         "Message from a")
+
+    def test_get_specific_message_fail_inexistent(self):
+        self.dummy_user.name = "DummyUserEmpty"
+        get_more(self.dummy_user, (None, "1"))
+        self.assertEqual(self.dummy_user.last_message,
+                         "Message does not exist, or does "
+                         "not belong to you.\r\n")
+
+    def test_get_specific_message_fail_on_coward(self):
+        self.dummy_user.status = "coward"
+        get_more(self.dummy_user, (None, "1"))
         self.assertEqual(self.dummy_user.last_message,
                          "You can't do that!\r\n")
 

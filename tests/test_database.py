@@ -149,6 +149,7 @@ class DatabasePMTest(unittest.TestCase):
         self.database.send_pm("sender", "jakob", "Hello!")
         self.assertEqual(self.database.get_pm_count("jakob"), 1)
         self.assertTrue(self.database.get_pms("jakob"))
+        self.assertTrue(self.database.get_specific_pm("jakob", 1))
 
     def test_delete_aged_pm(self):
         self.config["max_message_age"] = 1

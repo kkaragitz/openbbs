@@ -91,8 +91,15 @@ class DummyDatabase(object):
         if name == "DummyUserEmpty":
             messages = ()
         else:
-            messages = (("a", "a", 1, False),)
+            messages = ((1, "a", "a", 1, False),)
         return messages
+
+    def get_specific_pm(self, name, message_id):
+        if name == "DummyUserEmpty":
+            message = ()
+        else:
+            message = ("a", "a")
+        return message
 
     def make_op(self, target):
         pass
