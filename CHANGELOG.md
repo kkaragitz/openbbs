@@ -12,6 +12,7 @@ This project uses the semantic versioning scheme.
 * Control character filtering is now much more subtle, and doesn't say when it happens.
 * Filtering is now used everywhere a user can provide text input.
 * Added a "more" option to read more of a private message, with an accompanying formatter.
+* **_DROPPED OFFICIAL SUPPORT FOR PYPY_** as it has serious consistency issues with hashing. Vanilla Python is actually faster when it comes to hashing anyway.
 
 
 **Version 0.4.0**

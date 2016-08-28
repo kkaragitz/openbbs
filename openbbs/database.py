@@ -95,7 +95,6 @@ class Database(object):
         result = self.cursor.fetchone()
         if result:
             hash_iterations = int(self.config.get("hash_iterations"))
-
             hashed = hash_password(password, result[0], hash_iterations)
             self.cursor.execute("SELECT user_status, last_login FROM users "
                                 "WHERE username = ? AND password = ?;",

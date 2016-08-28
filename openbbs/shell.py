@@ -1,7 +1,6 @@
 """Interactive shell for communication between the client and BBS."""
 
 import logging
-import time
 
 from openbbs import __version__
 from openbbs.command import CommandInterpreter
