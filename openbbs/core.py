@@ -22,9 +22,7 @@ def spawn_server(config, debug=False):
     """
     backlog = int(config.get("backlog"))
     port = int(config.get("port"))
-    host = config.get("host")
-    if not host:
-        host = socket.gethostbyname(socket.gethostname())
+    host = config.get("host") or socket.gethostbyname(socket.gethostname())
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
