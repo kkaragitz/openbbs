@@ -7,6 +7,7 @@ dist/
 *.egg
 .tox/
 .coverage
+TAGS
 
 OpenBBS_Screenshot.png
 openbbs.log
