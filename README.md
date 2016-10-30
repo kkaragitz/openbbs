@@ -1,9 +1,9 @@
+**THIS REPOSITORY IS NO LONGER ACTIVELY MAINTAINED.**
+
 ![OpenBBS](https://raw.github.com/TsarFox/openbbs/master/OpenBBS_Logo.png "OpenBBS")
 =========
 ## Server software programmed and maintained by [Jakob.](http://tsar-fox.com/)
 OpenBBS is a simple text-based BBS server written in Python. Its goal is to be easily accessible to anyone with Netcat or a Telnet client, and functional on both major versions of Python.
-
-A working deployment of this server is currently running at tsar-fox.com:1337.
 
 OpenBBS is free software, licensed under the GNU Affero General Public License.
 
